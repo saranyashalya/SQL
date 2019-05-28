@@ -1,0 +1,158 @@
+#Create database
+create database sample;
+
+#Altering db name
+Alter database sample Modify Name = samplydb;
+or
+Execute sp_renamedb 'sample','sampledb';
+
+#Drop database
+Drop Database samplydb;
+
+Alter database samplydb set SINGLE_USER with Rollback Immediate;
+
+# Create tables
+create table tblPerson
+(Name nvarchar(50),
+Email nvarchar(50),
+GenderId int Not NULL);
+
+create table tblGender
+(Id int Not Null Primary Key,
+Gender nvarchar(50));
+
+#Adding foreign key
+Alter table tblPerson
+add constraint tblPerson_GenderId_FK FOREIGN KEY (GenderId) references
+tblGender(Id);
+
+#Adding default constraint
+Alter table tblPerson
+add constraint tblperson_default_constraint
+DEFAULT 1 for GenderId;
+
+#Inserting rows;
+Insert into tblPerson(Name,Email) values('sara','avc@df.com');
+#by default 1 is inserted for GenderId
+
+#With below statement NULL will be inserted instead of default values
+Insert into tblPerson
+(Name,Email,GenderId) 
+values
+('sara','avc@df.com',NULL);
+
+#Drop constraint
+Alter table tblPerson 
+drop constraint tblperson_default_constraint;
+
+#Check constraint 
+Alter table tblPerson
+add constraint ck_check_age 
+check (age>0 AND age<120);
+
+Note: NULL is allowed on check constraint column, because the boolean expression (age>0 and age <150) will be 
+evaluated to unknown and hence it allows NULL inserts.
+
+
+#Identity column
+#Identity column is the column which is auto incremented by SQL
+
+  Alter table tblPerson 
+  add personid int identity(1,1);
+
+#below statement will automatically insert 1 value for personid
+insert into tblPerson (Name, Email, GenderId, age) values('shal','dfd@df.com', 1,100);
+
+#If we want to manually mention the identity column value, then we need to on the set identity_insert and also column list 
+should be explicitly stated.
+
+SET IDENTITY_INSERT tblPerson ON;
+insert into tblPerson (Name, Email, GenderId, age, personid) values('shal','dfd@df.com', 1,100,2);
+
+#else we have to swich off set identity_insert off. 
+SET IDENTITY_INSERT tblPerson OFF;
+insert into tblPerson (Name, Email, GenderId, age) values('shal','dfd@df.com', 1,100);
+
+#even after all records are deleted, the next insert will continue the sequence of identity column
+delete from tblPerson;
+insert into tblPerson (Name, Email, GenderId, age) values('shal','dfd@df.com', 1,100);
+select * from tblPerson;
+
+#If you want to restart the sequence in identity column, we need to run below statement. 
+DBCC CHECKIDENT(tblPerson, RESEED,0);
+
+select * from tblPerson;
+insert into tblPerson (Name, Email, GenderId, age) values('shal','dfd@df.com', 1,100);
+
+#To retrive the latest value of the identity column
+select scope_identity();
+select @@IDENTITY;
+select IDENT_CURRENT('tblPerson');
+
+
+#Unique constraint
+Alter table tblPerson
+add constraint ck_unique_name
+unique(Name); 
+
+#aggregate function
+
+tblEmployee:
+ID	Name	Gender	Salary	City
+1	Tom	Male      	4000	London
+2	Pam	Female    	3000	New York
+3	John	Male      	3500	London
+4	Sam	Male      	4500	London
+5	Todd	Male      	2800	Sydney
+6	Ben	Male      	7000	New York
+7	Sara	Female    	4800	Sydney
+8	Valarie	Female    	5500	New York
+9	James	Male      	6500	London
+10	Russell	Male      	8800	London
+
+
+#Select sum(Sal) group by city
+select City, sum(Salary) as TotalSal
+from tblEmployee
+group by City
+
+#select sum(sal) group by city and gender
+select City, Gender, sum(Salary) as TotalSal
+from tblEmployee
+group by City, Gender;
+
+#select sum(sal) and count(id) group by city and gender
+select City, Gender, sum(Salary) as TotalSal, count(ID) as TotalEmp
+from tblEmployee
+group by City, Gender;
+
+
+#select sum(sal) group by city and gender where city is london -> this is filtering before aggregation
+select City, Gender, sum(Salary) as TotalSal
+from tblEmployee
+where City='London'
+group by City, Gender;
+
+#select sum(sal) group by city and gender where city is london -> this is filtering after aggregation
+select City, Gender, sum(Salary) as TotalSal
+from tblEmployee
+group by City, Gender 
+having City='London';
+
+#select sum(sal) group by city and gender where gender is male and city is london. -> this is using both where and having.
+select City, Gender, sum(Salary) as TotalSal
+from tblEmployee
+where Gender='Male'
+group by City, Gender
+having City='London';
+
+Difference between WHERE and HAVING clause:
+1. WHERE clause can be used with - Select, Insert, and Update statements, 
+where as HAVING clause can only be used with the Select statement.
+2. WHERE filters rows before aggregation (GROUPING), where as, HAVING filters groups, 
+after the aggregations are performed.
+3. Aggregate functions cannot be used in the WHERE clause, unless it is in a sub query 
+contained in a HAVING clause, whereas, aggregate functions can be used in Having clause.
+
+
+
