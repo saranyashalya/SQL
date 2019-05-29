@@ -1,0 +1,54 @@
+
+#creating procedure without parameters
+create procedure spgetNameAndGender
+as
+begin
+	Select Name, Gender from [tblEmployee]
+end
+
+#3 wayes to invoke a procedure
+spgetNameAndGender
+exec spgetNameAndGender
+execute spgetNameAndGender
+
+#Procedure with parameters
+create procedure spgetDeptIdAndGender
+@DepartmentId int,
+@Gender nvarchar(10)
+as
+begin
+	select * from tblEmployee where DepartmentId = @DepartmentId and Gender = @Gender
+end
+
+
+spgetDeptIdAndGender 1,'Male'
+exec spgetDeptIdAndGender 1,'Male'
+execute spgetDeptIdAndGender 1,'Male'
+
+ID	Name	Gender	Salary	DepartmentId
+1	Tom		Male	4000	1
+3	John	Male	3500	1
+6	Ben		Male	7000	1
+
+#To view the procedure content
+sp_helptext 'spgetDeptIdAndGender'
+
+#To encrypt the procedure
+alter procedure spgetDeptIdAndGender
+@DepartmentId int,
+@Gender nvarchar(10)
+with encryption
+as
+begin
+	select * from tblEmployee where DepartmentId = @DepartmentId and Gender = @Gender
+end
+
+#To view the procedure content
+sp_helptext 'spgetDeptIdAndGender'
+o/p
+The text for object 'spgetDeptIdAndGender' is encrypted.
+
+#drop procedure
+DROP PROCEDURE spgetNameAndGender
+DROP PROC spgetNameAndGender
+

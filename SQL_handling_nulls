@@ -1,0 +1,43 @@
+#Handling NULLs
+
+#using ISNULL()
+select e.Name as 'Employee Name', ISNULL(m.Name,'No Manager') as 'Manager Name' 
+from  tblemp e 
+left join
+tblemp m
+on e.ManagerID=m.EmployeeId
+
+#Using case statement
+select e.Name as 'Employee Name', case when m.Name IS NULL then 'No Manager'
+else m.name end as 'Manager Name'
+from  tblemp e 
+left join
+tblemp m
+on e.ManagerID=m.EmployeeId
+
+
+# Using coalesce
+select e.Name as 'Employee Name', COALESCE(m.Name,'No Manager') as 'Manager Name'
+from  tblemp e 
+left join
+tblemp m
+on e.ManagerID=m.EmployeeId
+
+
+#Coalesce function
+select * from tblnames;
+FirstName	MiddleName	LastName
+Sam	NULL	NULL
+NULL	Ram 	NULL
+NULL	NULL	Gopal
+Guna	NULL	Gandhi
+NULL	Sita	Sushma
+
+select COALESCE(FirstName, MiddleName, LastName) as Name from tblnames;
+o/p:
+Name
+Sam
+Ram 
+Gopal
+Guna
+Sita

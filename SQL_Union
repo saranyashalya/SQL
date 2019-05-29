@@ -1,0 +1,37 @@
+#Union & Union All
+
+#creating table by copying the structure
+select * into tblUKcustomers from tblIndiacustomers where 1=2;
+
+select * from tblIndiacustomers;
+Id	Email	Name
+3	ram@gmail.com	ram
+5	gokul@gmail.com	gokul
+
+select * from tblUKcustomers;
+Id	Email	Name
+3	ram@gmail.com	ram
+4	sam@gmail.com	sam
+
+#Union removes duplicates. Due to distinct sort, this takes time.
+select * from tblIndiacustomers 
+union 
+select * from tblUKcustomers;
+Id	Email	Name
+3	ram@gmail.com	ram
+4	sam@gmail.com	sam
+5	gokul@gmail.com	gokul
+
+#Union all will not remove duplicates
+select * from tblIndiacustomers
+union all
+select * from tblUKcustomers;
+Id	Email	Name
+3	ram@gmail.com	ram
+5	gokul@gmail.com	gokul
+3	ram@gmail.com	ram
+4	sam@gmail.com	sam
+
+Joins is to join the rows and colums is to combine the columns
+
+Note: For UNION and UNION ALL to work, the Number, Data types, and the order of the columns in the select statements should be same.
