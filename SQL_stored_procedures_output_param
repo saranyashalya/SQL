@@ -1,0 +1,22 @@
+
+#stored procedure with output parameter
+create procedure spgetCountEmp
+@Gender nvarchar(10),
+@Empcount int Output
+as
+begin
+	select @Empcount = count(*) from tblEmployee where Gender = @Gender
+end
+
+Declare @Emptotal int
+exec spgetCountEmp 'Male', @Emptotal output
+print(@Emptotal)
+
+#To view the details of procedure, like parameters and datatypes
+sp_help 'spgetCountEmp'
+
+#To view the content of stored procedure
+sp_helptext 'spgetCountEmp'
+
+#To view the dependencies
+sp_depends 'spgetCountEmp'
