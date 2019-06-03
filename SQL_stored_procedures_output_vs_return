@@ -1,0 +1,75 @@
+
+
+##SQL procedure with output variable printing total count
+
+create procedure spTotalCountEmp 
+@totalcnt int Output
+as
+begin
+select @totalcnt = count(ID) from tblEmployee
+end
+
+#Adding print statement to display the output
+Declare @totalcnt int
+Declare @Printmessage nvarchar(50)
+exec spTotalCountEmp @totalcnt Output
+set @Printmessage = N'Total emp count: '+ CAST(@totalcnt AS nvarchar(10)) 
+print @Printmessage
+
+
+##Using return try to return value from stored procedure..
+#Only Integer value can be returned 
+
+#Below execution returns conversion error because Name is tried to return
+alter procedure spSelectNameById
+@Id int
+as
+begin
+return(select Name from tblEmployee where ID=@Id)
+end
+
+Declare @EmpName nvarchar(10)
+exec  @EmpName = spSelectNameById 1
+print @EmpName
+ 
+##Same procedure if tried to return ID it works because ID is integer
+
+alter procedure spSelectNameById
+@Id int
+as
+begin
+return(select ID from tblEmployee where ID=@Id)
+end
+
+Declare @EmpName nvarchar(10)
+exec  @EmpName = spSelectNameById 1
+print @EmpName
+o/p
+1
+
+
+##Returning multiple output variables from stored procedure
+create procedure spSelectNameAndGenderById
+@Id int,
+@Name nvarchar(10) Output,
+@Gender nvarchar(10) Output
+as
+begin
+ select @Name = Name, @Gender = Gender from tblEmployee where ID=@Id
+end
+
+Declare @EmpName nvarchar(10)
+Declare @Gender nvarchar(10)
+exec  spSelectNameAndGenderById @Id =1 , @Name = @EmpName OUTPUT, @Gender = @Gender OUTPUT 
+print @EmpName
+print @Gender
+
+Difference between Return status variable and Output variable
+
+Return status variable				Output variable
+1. returns only integer Datatype	1. Any Datatype
+2. Only one value					2. Multiple value
+3. Used to return success or failure 3. Used to return name, count etc
+
+
+
