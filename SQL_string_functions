@@ -1,0 +1,103 @@
+
+
+select * from tbl1
+o/p
+id
+1
+1
+
+select * from tbl2
+o/p
+ID
+1
+1
+1
+
+select tbl1.ID from tbl1 
+inner join
+tbl2 on tbl1.ID = tbl2.ID
+o/p
+ID
+1
+1
+1
+1
+1
+1
+
+
+select * from tbl1 
+union all
+select * from tbl2 
+id
+1
+1
+1
+1
+1
+
+select * from tbl1 
+union 
+select * from tbl2 
+o/p
+id
+1
+
+
+
+#String functions
+select ASCII('S')
+
+#Printing ASCII characters between 1 to 255
+
+Declare @Number int
+Set @Number =1
+while(@Number<=255)
+Begin
+	print CHAR(@Number)
+	set @Number = @Number + 1
+end
+
+##Printing uppercase alphabets 
+Declare @Number int
+Set @Number =65
+while(@Number<=90)
+Begin
+	print CHAR(@Number)
+	set @Number = @Number + 1
+end
+
+##Printing lowercase alphabets
+Declare @Number int
+Set @Number =97
+while(@Number<=122)
+Begin
+	print CHAR(@Number)
+	set @Number = @Number + 1
+end
+
+##Another way of printing lowercase alphabets
+Declare @Number int
+Set @Number =65
+while(@Number<=90)
+Begin
+	print LOWER(CHAR(@Number))
+	set @Number = @Number + 1
+end
+
+##Removing white spaces
+select ('   hello')
+select LTRIM('   hello')
+select RTRIM('hello    ')
+select LTRIM(RTRIM('   hello    '))
+
+##converting lower to upper 
+select LOWER('THIS IS CONVERTED TO LOWER')
+select UPPER('this is converted to upper')
+
+#converting reverse string
+select REVERSE('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
+
+#length of string
+select LEN('Saranya')
+
