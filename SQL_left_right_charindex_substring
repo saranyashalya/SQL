@@ -1,0 +1,37 @@
+
+#Left function 
+select LEFT('saranya',5)
+saran
+
+#Right function
+select right('saranya',3)
+nya
+
+#CHARINDEX('Expression_To_Find', 'Expression_To_Search', 'Start_Location')
+select CHARINDEX('#','sdfd#dfdfdfd#df',6)
+13
+
+#SUBSTRING('Expression', 'Start', 'Length')
+select SUBSTRING('123456789',5,5)
+56789
+
+select SUBSTRING('123456789',(CHARINDEX('4','123456789')+1),
+(LEN('123456789')-CHARINDEX('4','123456789')))
+56789
+
+## select the count of domains 
+ select * from tblPerson;
+Name	Email	GenderId	age	personid
+shal	dfd@df.com	1	100	7
+sam		sam@df.com	1	50	3
+ram		ram@gmail.com	2	60	4
+ere		ere@gmail.com	2	67	5
+tty		tty@rtr.com	1	45	6
+
+ SELECT (SUBSTRING(Email, (CHARINDEX('@',Email)+1),(LEN(Email)-CHARINDEX('@',Email)))) as 'Domain Name', count(*) as count 
+  from tblPerson group by (SUBSTRING(Email, (CHARINDEX('@',Email)+1),(LEN(Email)-CHARINDEX('@',Email))))
+
+Domain Name	count
+df.com		2
+gmail.com	2
+rtr.com		1
