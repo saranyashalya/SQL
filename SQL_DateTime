@@ -1,0 +1,165 @@
+#DateTime
+ CREATE TABLE [tblDateTime]
+(
+ [c_time] [time](7) NULL,
+ [c_date] [date] NULL,
+ [c_smalldatetime] [smalldatetime] NULL,
+ [c_datetime] [datetime] NULL,
+ [c_datetime2] [datetime2](7) NULL,
+ [c_datetimeoffset] [datetimeoffset](7) NULL
+)
+
+
+INSERT INTO tblDateTime VALUES (GETDATE(),GETDATE(),GETDATE(),GETDATE(),GETDATE(),GETDATE())
+
+select * from tblDateTime
+c_time				c_date		c_smalldatetime		c_datetime				c_datetime2					c_datetimeoffset
+19:28:30.1233333	2019-06-08	2019-06-08 19:29:00	2019-06-08 19:28:30.123	2019-06-08 19:28:30.1233333	2019-06-08 19:28:30.1233333 +00:00
+
+select GETDATE()
+2019-06-08 19:34:27.237
+
+select CURRENT_TIMESTAMP
+2019-06-08 19:34:45.677
+
+select SYSDATETIME()
+2019-06-08 19:35:00.9120046
+
+select SYSDATETIMEOFFSET()
+2019-06-08 19:35:12.8495208 +05:30
+
+select GETUTCDATE()
+2019-06-08 14:05:22.817
+
+select SYSUTCDATETIME()
+2019-06-08 14:05:29.6619955
+
+select ISDATE(GETDATE())
+1
+
+select ISDATE('saranya')
+0
+
+#datetime2  (Returns error for datetime2, ISDATE() will return error)
+select ISDATE(SYSDATETIME())
+
+select ISDATE(SYSUTCDATETIME())
+
+# returns day of the month
+select DAY(GETDATE())
+8
+
+select MONTH(GETDATE())
+6
+select YEAR(GETDATE())
+2019
+
+#DateName(DatePart, Date) - Returns a string, that represents a part of the given date. 
+This functions takes 2 parameters. The first parameter 'DatePart' specifies, the part of the date, we want. 
+The second parameter, is the actual date, from which we want the part of the Date.
+
+select DATENAME(Day, GETDATE())
+8
+
+select DATENAME(week, getdate())
+23
+
+select * from tblemp;
+EmployeeId	Name	ManagerID	DOB
+1			Mike	3	1980-01-01 10:00:00.000
+2			Rob	1	1987-09-01 11:20:00.000
+3			Todd	NULL	1990-11-12 23:11:00.000
+4			Ben	1	1995-01-09 08:10:00.000
+5			Sam	1	2000-07-12 07:08:00.000
+NULL		NULL	NULL	2005-08-10 09:10:00.000
+NULL		NULL	NULL	2010-09-11 10:12:00.000
+NULL		NULL	NULL	2015-05-12 06:30:00.000
+NULL		NULL	NULL	2018-09-12 07:20:00.000
+
+
+#Datepart returns integer
+SELECT EmployeeID, DOB, Day(DOB) as Day, Month(DOB) as Month, DATEPART(MONTH, DOB) as Monthname from tblemp
+
+EmployeeID	DOB	Day	Month	Monthname
+1			1980-01-01 10:00:00.000	1	1	1
+2			1987-09-01 11:20:00.000	1	9	9
+3			1990-11-12 23:11:00.000	12	11	11
+4			1995-01-09 08:10:00.000	9	1	1
+5			2000-07-12 07:08:00.000	12	7	7
+NULL		2005-08-10 09:10:00.000	10	8	8
+NULL		2010-09-11 10:12:00.000	11	9	9
+NULL		2015-05-12 06:30:00.000	12	5	5
+NULL		2018-09-12 07:20:00.000	12	9	9
+
+#Datename function returns nvarchar
+
+SELECT EmployeeID, DOB, Day(DOB) as Day, Month(DOB) as Month, DATENAME(MONTH, DOB) as Monthname from tblemp
+
+EmployeeID	DOB	Day	Month	Monthname
+1			1980-01-01 10:00:00.000	1	1	January
+2			1987-09-01 11:20:00.000	1	9	September
+3			1990-11-12 23:11:00.000	12	11	November
+4			1995-01-09 08:10:00.000	9	1	January
+5			2000-07-12 07:08:00.000	12	7	July
+NULL		2005-08-10 09:10:00.000	10	8	August
+NULL		2010-09-11 10:12:00.000	11	9	September
+NULL		2015-05-12 06:30:00.000	12	5	May
+NULL		2018-09-12 07:20:00.000	12	9	September
+
+#DATEADD (datepart, NumberToAdd, date) 
+Select EmployeeID, DOB, DATEADD(Day, 5, DOB) from tblemp;
+
+EmployeeID	DOB	(No column name)
+1		1980-01-01 10:00:00.000	1980-01-06 10:00:00.000
+2		1987-09-01 11:20:00.000	1987-09-06 11:20:00.000
+3		1990-11-12 23:11:00.000	1990-11-17 23:11:00.000
+4		1995-01-09 08:10:00.000	1995-01-14 08:10:00.000
+5		2000-07-12 07:08:00.000	2000-07-17 07:08:00.000
+NULL	2005-08-10 09:10:00.000	2005-08-15 09:10:00.000
+NULL	2010-09-11 10:12:00.000	2010-09-16 10:12:00.000
+NULL	2015-05-12 06:30:00.000	2015-05-17 06:30:00.000
+NULL	2018-09-12 07:20:00.000	2018-09-17 07:20:00.000
+
+#subtracts 5 days from DOB
+Select EmployeeID, DOB, DATEADD(Day, -5, DOB) from tblemp;
+
+#DATEDIFF(datepart, startdate, enddate)
+Select DATEDIFF(MONTH, '11/30/2005','01/31/2006') -- returns 2
+Select DATEDIFF(DAY, '11/30/2005','01/31/2006') -- returns 62
+
+
+##Create a function to find the age from dob
+CREATE FUNCTION fnComputeAge(@DOB DATETIME)
+RETURNS NVARCHAR(50)
+AS
+BEGIN
+
+DECLARE @tempdate DATETIME, @years INT, @months INT, @days INT
+SELECT @tempdate = @DOB
+
+SELECT @years = DATEDIFF(YEAR, @tempdate, GETDATE()) - CASE WHEN (MONTH(@DOB) > MONTH(GETDATE())) OR (MONTH(@DOB) = MONTH(GETDATE()) AND DAY(@DOB) > DAY(GETDATE())) THEN 1 ELSE 0 END
+SELECT @tempdate = DATEADD(YEAR, @years, @tempdate)
+
+SELECT @months = DATEDIFF(MONTH, @tempdate, GETDATE()) - CASE WHEN DAY(@DOB) > DAY(GETDATE()) THEN 1 ELSE 0 END
+SELECT @tempdate = DATEADD(MONTH, @months, @tempdate)
+
+SELECT @days = DATEDIFF(DAY, @tempdate, GETDATE())
+
+DECLARE @Age NVARCHAR(50)
+SET @Age = Cast(@years AS  NVARCHAR(4)) + ' Years ' + Cast(@months AS  NVARCHAR(2))+ ' Months ' +  Cast(@days AS  NVARCHAR(2))+ ' Days Old'
+RETURN @Age
+
+End
+
+Select DOB, dbo.fnComputeAge(DOB) as Age from tblemp
+o/p
+DOB	Age
+1980-01-01 10:00:00.000	39 Years 5 Months 8 Days Old
+1987-09-01 11:20:00.000	31 Years 9 Months 8 Days Old
+1990-11-12 23:11:00.000	28 Years 6 Months 28 Days Old
+1995-01-09 08:10:00.000	24 Years 5 Months 0 Days Old
+2000-07-12 07:08:00.000	18 Years 10 Months 28 Days Old
+2005-08-10 09:10:00.000	13 Years 9 Months 30 Days Old
+2010-09-11 10:12:00.000	8 Years 8 Months 29 Days Old
+2015-05-12 06:30:00.000	4 Years 0 Months 28 Days Old
+2018-09-12 07:20:00.000	0 Years 8 Months 28 Days Old
