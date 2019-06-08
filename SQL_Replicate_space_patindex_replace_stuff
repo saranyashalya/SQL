@@ -1,0 +1,66 @@
+
+#REPLICATE(String_To_Be_Replicated, Number_Of_Times_To_Replicate) - 
+ select replicate('Saranya ',3)
+ o/p: Saranya Saranya Saranya 
+ 
+ ##Masking the email id
+ 
+ select Name, SUBSTRING(Email, 1,2) + Replicate('*',5) + SUBSTRING(Email, (CHARINDEX('@',Email)), LEN(Email) - CHARINDEX('@',Email)) as 'Masked ID'
+ from tblPerson;
+o/p:
+ Name	Masked ID
+shal	df*****@df.co
+sam		sa*****@df.co
+ram		ra*****@gmail.co
+ere		er*****@gmail.co
+tty		tt*****@rtr.co
+
+#SPACE(Number_Of_Spaces) 
+ select Name+ SPACE(5) + Email as 'Name+Email' from tblPerson;
+
+Name+Email
+shal     dfd@df.com
+sam     sam@df.com
+ram     ram@gmail.com
+ere     ere@gmail.com
+tty     tty@rtr.com
+
+#PATINDEX('%Pattern%', Expression)
+ select Name, PATINDEX('%@df.com', Email) 
+ from tblPerson
+ where PATINDEX('%@df.com',Email)>0
+
+Name	First Occurence
+shal	4
+sam	4
+ 
+# REPLACE(String_Expression, Pattern , Replacement_Value)
+ select Name, Replace(Email,'.com','.net')
+ from tblPerson
+
+Name	(No column name)
+shal	dfd@df.net
+sam		sam@df.net
+ram		ram@gmail.net
+ere		ere@gmail.net
+tty		tty@rtr.net
+
+#STUFF(Original_Expression, Start, Length, Replacement_expression)
+STUFF() function inserts Replacement_expression, at the start position specified, along with removing the charactes specified using Length parameter.
+
+ select * from tblPerson;
+ Name	Email	GenderId	age	personid
+shal	dfd@df.com	1	100	7
+sam	sam@df.com	1	50	3
+ram	ram@gmail.com	2	60	4
+ere	ere@gmail.com	2	67	5
+tty	tty@rtr.com	1	45	6
+ 
+ select Name, STUFF(Email, 2, 3, '*****') from tblPerson;
+ 
+ Name	(No column name)
+shal	d*****df.com
+sam		s*****df.com
+ram		r*****gmail.com
+ere		e*****gmail.com
+tty		t*****rtr.com
