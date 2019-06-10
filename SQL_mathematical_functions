@@ -1,0 +1,75 @@
+
+
+ Select ABS(-10.4)
+ 10.4
+
+ Select CEILING(10.4)
+11
+
+ Select Floor(10.8)
+10
+
+ Select POWER(2,3)
+8
+ 
+ Select RAND(5) #Always provides same value
+  0.714343
+
+Select RAND() # provide new value on every execution
+
+
+#If we want a number between 1 to 100
+Select FLOOR(RAND(5)*100)
+71
+
+
+#printing 10 random variables
+
+Declare @counter int;
+Set @counter = 1;
+while(@counter <=10)
+begin
+print(floor(rand()*100))
+set @counter = @counter+1
+end
+
+o/p:
+17
+39
+41
+82
+77
+87
+96
+69
+87
+80
+
+Select SQUARE(9)
+81
+
+Select SQRT(9)
+3
+
+ROUND ( numeric_expression , length [ ,function ] ) - Rounds the given numeric expression based on the given length. This function takes 3 parameters. 
+1. Numeric_Expression is the number that we want to round.
+2. Length parameter, specifies the number of the digits that we want to round to. If the length is a positive number, then the rounding is applied for the decimal part, where as if the length is negative, then the rounding is applied to the number before the decimal.
+3. The optional function parameter, is used to indicate rounding or truncation operations. A value of 0, indicates rounding, where as a value of non zero indicates truncation. Default, if not specified is 0.
+
+
+Select ROUND(800.556,1)
+800.600
+
+Select ROUND(800.556,1,1)
+800.500
+
+Select Round(800.556,2)
+800.560
+
+Select Round(800.556,2,1)
+800.550
+
+#two digits to the left of decimal is rounded.
+Select Round(889.556,-2)
+900
+
