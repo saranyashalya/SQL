@@ -1,0 +1,33 @@
+In SQL Server there are 3 types of User Defined functions
+1. Scalar functions
+2. Inline table-valued functions
+3. Multistatement table-valued functions
+
+
+#create function to return age
+create function Age(@DBO Date)
+returns int
+begin
+Declare @Age int
+Set @Age = DATEDIFF(Year, @DBO, GETDATE()) - Case when(MONTH(@DBO)> MONTH(GETDATE()) OR (MONTH(@DBO)= MONTH(GETDATE())) AND (DAY(@DBO) > DAY(GETDATE()))) THEN 1 ELSE 0 END
+Return @Age
+end
+
+#invoking function
+database owner.function name
+or
+databasename.db owner.function name
+
+select Name, dbo.Age(DOB) as Age from tblemp;
+or
+select Name, sample.dbo.Age(DOB) as Age from tblemp;
+
+Name	Age
+Mike	39
+Rob	31
+Todd	28
+Ben	24
+Sam	18
+
+A stored procedure also can accept DateOfBirth and return Age, but you cannot use stored procedures in a select or where clause. 
+This is just one difference between a function and a stored procedure. 
