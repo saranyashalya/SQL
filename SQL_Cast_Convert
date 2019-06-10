@@ -1,0 +1,56 @@
+#Syntax of CAST and CONVERT functions from MSDN:
+CAST ( expression AS data_type [ ( length ) ] )
+CONVERT ( data_type [ ( length ) ] , expression [ , style ] )
+
+ Select Name, CAST(DOB as nvarchar(20)) as 'DOB in string' from [sample].[dbo].[tblemp]
+ Select Name, CONVERT(nvarchar(20) , DOB) from tblemp
+
+o/p
+Name	DOB in string
+Mike	Jan  1 1980 10:00AM
+Rob	Sep  1 1987 11:20AM
+Todd	Nov 12 1990 11:11PM
+Ben	Jan  9 1995  8:10AM
+Sam	Jul 12 2000  7:08AM
+
+#CAST has style parameter using which we can change the format we want to see the date.
+ Select Name, CONVERT(nvarchar(20) , DOB, 103) as 'DOB in string' from tblemp
+Name	DOB in string
+Mike	01/01/1980
+Rob	01/09/1987
+Todd	12/11/1990
+Ben	09/01/1995
+Sam	12/07/2000
+
+ Select CONVERT(DATE, GETDATE())
+ Select CONVERT(DATE, GETDATE())
+ 
+ o/p
+ (No column name)
+2019-06-10
+
+ Select Name, Name + '-' + CAST(EmployeeId as nvarchar(5)) as 'Name+Id' from tblemp
+ 
+ Name	Name+Id
+Mike	Mike-1
+Rob	Rob-2
+Todd	Todd-3
+Ben	Ben-4
+Sam	Sam-5
+
+
+ Select CAST(DOB as DATE) as 'Date', count(*) as 'Count' from tblEmp group by DOB;
+ 
+ Date	Count
+1980-01-01	1
+1987-09-01	1
+1990-11-12	1
+1995-01-09	1
+2000-07-12	1
+
+The following are the differences between the 2 functions.
+1. Cast is based on ANSI standard and Convert is specific to SQL Server. So, if portability is a concern and if you want to use the script with other database applications, use Cast(). 
+
+2. Convert provides more flexibility than Cast. For example, it's possible to control how you want DateTime datatypes to be converted using styles with convert function.
+
+The general guideline is to use CAST(), unless you want to take advantage of the style functionality in CONVERT().
