@@ -1,0 +1,36 @@
+#Multivalued table functions
+
+Now let's understand the differences between Inline Table Valued functions and Multi-statement Table Valued functions
+1. In an Inline Table Valued function, the RETURNS clause cannot contain the structure of the table, the function returns. Where as, with the multi-statement table valued function, we specify the structure of the table that gets returned
+2. Inline Table Valued function cannot have BEGIN and END block, where as the multi-statement function can have.
+3. Inline Table valued functions are better for performance, than multi-statement table valued functions. If the given task, can be achieved using an inline table valued function, always prefer to use them, over multi-statement table valued functions.
+4. It's possible to update the underlying table, using an inline table valued function, but not possible using multi-statement table valued function.
+
+
+create function Multivaluedtableeg(@Gender nvarchar(10))
+returns @table Table(Id int, Name nvarchar(20), Gender nvarchar(10))
+as
+begin
+insert into @table 
+select Id, Name, Gender from tblEmployee
+where Gender = @Gender
+return
+end
+
+
+Select * from Multivaluedtableeg('Male')
+
+Id          Name                 Gender
+----------- -------------------- ----------
+1           Tom                  Male
+3           John                 Male
+4           Sam                  Male
+5           Todd                 Male
+6           Ben                  Male
+9           James                Male
+10          Russell              Male
+
+Update Multivaluedtableeg('Male') set Name = 'Tommy' where Id = 1
+o/p
+returns error
+Multiline table functions cannot update table
