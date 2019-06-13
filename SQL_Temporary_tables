@@ -1,0 +1,67 @@
+
+
+Create Table #PersonDetails(Id int, Name nvarchar(20))
+
+Insert into #PersonDetails Values(1, 'Mike')
+Insert into #PersonDetails Values(2, 'John')
+Insert into #PersonDetails Values(3, 'Todd')
+
+Select * from #PersonDetails;
+
+
+Select name from tempdb..sysobjects
+where name like '%PersonDetails%'
+o/p
+name
+#PersonDetails______________________________________________________________________________________________________0000000003AE
+
+A local temporary table is available, only for the connection that has created the table. If you open another query window, and 
+execute the following query you get an error stating 'Invalid object name #PersonDetails'.
+This proves that local temporary tables are available, only for the connection that has created them.
+
+Create procedure poc_temp_table_creation
+as
+begin
+Create Table #PersonDetails(Id int, Name nvarchar(20))
+
+Insert into #PersonDetails Values(1, 'Mike')
+Insert into #PersonDetails Values(2, 'John')
+Insert into #PersonDetails Values(3, 'Todd')
+
+Select * from #PersonDetails
+end
+
+exec poc_temp_table_creation
+o/p
+Id	Name
+1	Mike
+2	John
+3	Todd
+
+There will be no temp table available under tempdb-> temporary tables because the scope of the temporary variable is only within the stored procedure
+
+It is also possible for different connections, to create a local temporary table with the same name.
+ For example User1 and User2, both can create a local temporary table with the same name #PersonDetails. 
+ Now, if you expand the Temporary Tables folder in the TEMPDB database, you should see 2 tables with name #PersonDetails and some random number 
+ at the end of the name. 
+To differentiate between, the User1 and User2 local temp tables, sql server appends the random number at the end of the temp table name. 
+
+#Global Temporary tables
+
+Create Table ##PersonDetails(Id int, Name nvarchar(20))
+
+Insert into ##PersonDetails Values(1, 'Mike')
+Insert into ##PersonDetails Values(2, 'John')
+Insert into ##PersonDetails Values(3, 'Todd')
+
+
+Difference Between Local and Global Temporary Tables:
+1. Local Temp tables are prefixed with single pound (#) symbol, where as gloabl temp tables are prefixed with 2 pound (##) symbols.
+
+2. SQL Server appends some random numbers at the end of the local temp table name, where this is not done for global temp table names.
+
+3. Local temporary tables are only visible to that session of the SQL Server which has created it, 
+where as Global temporary tables are visible to all the SQL server sessions
+
+4. Local temporary tables are automatically dropped, when the session that created the temporary tables is closed, 
+where as Global temporary tables are destroyed when the last connection that is referencing the global temp table is closed.
