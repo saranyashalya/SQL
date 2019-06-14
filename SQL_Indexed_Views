@@ -1,0 +1,60 @@
+What is an Indexed View or What happens when you create an Index on a view?
+A standard or Non-indexed view, is just a stored SQL query. 
+When, we try to retrieve data from the view, the data is actually retrieved from the underlying base tables. 
+So, a view is just a virtual table it does not store any data, by default.
+
+However, when you create an index, on a view, the view gets materialized. 
+This means, the view is now, capable of storing data. In SQL server, we call them Indexed views and in Oracle, Materialized views.
+
+
+#create view to get the total sales and total transactions
+
+create view vWTotalSaleByProduct
+with SchemaBinding
+as
+Select Name, SUM(ISNULL(UnitPrice * QuantitySold,0)) as TotalSales, count_big(*) as TotalTransactions
+from dbo.tblProduct
+join
+dbo.tblProductSales 
+on dbo.tblProduct.ProductId = dbo.tblProductSales.ProductId
+group by Name
+
+select * from vWTotalSaleByProduct
+o/p
+Name	TotalSales	TotalTransactions
+Books	960			4
+Clips	340			2
+Pencils	385			2
+Pens	336			2
+
+
+If you want to create an Index, on a view, the following rules should be followed by the view. For the complete list of all rules, please check MSDN.
+1. The view should be created with SchemaBinding option.
+
+2. If an Aggregate function in the SELECT LIST, references an expression, and if there is a possibility for that expression to become NULL,
+ then, a replacement value should be specified. In this example, we are using, ISNULL() function, to replace NULL values with ZERO.
+
+3. If GROUP BY is specified, the view select list must contain a COUNT_BIG(*) expression
+
+4. The base tables in the view, should be referenced with 2 part name. In this example, tblProduct and tblProductSales are referenced using dbo.tblProduct 
+and dbo.tblProductSales respectively.
+
+The first index that you create on a view, must be a unique clustered index. 
+After the unique clustered index has been created, you can create additional nonclustered indexes.
+
+#creating clustered unique index 
+create unique clustered index UIX_vWTotalSalesByProduct_Name
+on vWTotalSaleByProduct(Name)
+
+Select * from vWTotalSaleByProduct
+o/p
+Name	TotalSales	TotalTransactions
+Books	960	4
+Clips	340	2
+Pencils	385	2
+Pens	336	2
+
+Indexed views, can significantly improve the performance of queries that involves JOINS and Aggeregations. The cost of maintaining an indexed view is much higher than the cost of maintaining a table index. 
+
+Indexed views are ideal for scenarios, where the underlying data is not frequently changed. Indexed views are more often used in OLAP systems, because the data is mainly used for reporting and analysis purposes.
+ Indexed views, may not be suitable for OLTP systems, as the data is frequently addedd and changed.

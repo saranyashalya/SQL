@@ -1,0 +1,119 @@
+
+#What is a View?
+A view is nothing more than a saved SQL query. A view can also be considered as a virtual table. 
+
+
+create view VWEmployeesByDepartment
+as
+  select Id, Name, Salary, Gender, DeptName
+  from tblEmployee
+  inner join
+  tblDepartment
+  on tblEmployee.DepartmentId = tblDepartment.DeptId
+
+select * from VWEmployeesByDepartment
+
+o/p
+Id	Name	Salary	Gender	DeptName
+1	John	5000	Male	HR
+2	Mike	3400	Male	Payroll
+3	Pam	6000	Female	IT
+4	Todd	4800	Male	Admin
+5	Sara	3200	Female	IT
+6	Ben	4800	Male	HR
+
+Advantages of views:
+
+1.Views can be used to reduce the complexity of the database schema, for non IT users. 
+The sample view, vWEmployeesByDepartment, hides the complexity of joins. 
+Non-IT users, finds it easy to query the view, rather than writing complex joins.
+
+2. Security reasons
+##Row level security
+
+#Granting access only to the view to the users who want to view only IT employee details, we can restrict access through views 
+
+Alter view VWEmployeesByDepartment
+as
+  select Id, Name, Salary, Gender, DeptName
+  from tblEmployee
+  inner join
+  tblDepartment
+  on tblEmployee.DepartmentId = tblDepartment.DeptId
+  where tblDepartment.DeptName ='IT'
+
+select * from VWEmployeesByDepartment;
+
+Id	Name	Salary	Gender	DeptName
+3	Pam	6000	Female	IT
+5	Sara	3200	Female	IT
+
+
+## Column level security
+
+create view VWEmployeesByDepartmentnonconfidential
+as
+  select Id, Name,  Gender, DeptName
+  from tblEmployee
+  inner join
+  tblDepartment
+  on tblEmployee.DepartmentId = tblDepartment.DeptId
+
+
+select * from VWEmployeesByDepartmentnonconfidential;
+
+Id	Name	Gender	DeptName
+1	John	Male	HR
+2	Mike	Male	Payroll
+3	Pam	Female	IT
+4	Todd	Male	Admin
+5	Sara	Female	IT
+6	Ben	Male	HR
+
+
+3. summarizing the output
+create view VWEmployeesByDepartmentcount
+as
+  select DeptName, count(Id) as TotalEmployees
+  from tblEmployee
+  inner join
+  tblDepartment
+  on tblEmployee.DepartmentId = tblDepartment.DeptId
+  group by tblDepartment.DeptName
+
+select * from VWEmployeesByDepartmentcount
+
+DeptName	TotalEmployees
+Admin	1
+HR		2
+IT		2
+Payroll	1
+
+##updateable views
+
+update VWEmployeesByDepartmentnonconfidential
+set Name ='Sara' where Id =1
+
+Id	Name	Gender	DeptName
+1	Sara	Male	HR
+2	Mike	Male	Payroll
+3	Pam	Female	IT
+4	Todd	Male	Admin
+5	Sara	Female	IT
+6	Ben	Male	HR
+
+##updateable views has changed the table data
+select * from tblEmployee
+o/p
+Id	Name	Salary	Gender	DepartmentId
+1	Sara	5000	Male	3
+2	Mike	3400	Male	2
+3	Pam	6000	Female	1
+4	Todd	4800	Male	4
+5	Sara	3200	Female	1
+6	Ben	4800	Male	3
+
+The UPDATE statement, updated DeptName from HR to IT in tblDepartment table, instead of updating DepartmentId column in tblEmployee table. 
+So, the conclusion - If a view is based on multiple tables, and if you update the view, it may not update the underlying base tables correctly. 
+To correctly update a view, that is based on multiple table, INSTEAD OF triggers are used.
+

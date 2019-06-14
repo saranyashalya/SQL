@@ -1,0 +1,42 @@
+
+
+1. You cannot pass parameters to a view. Table Valued functions are an excellent replacement for parameterized views.
+
+create function fn_withparameters (@Gender nvarchar(10))
+Returns Table
+as
+Return(Select Id, Name, Gender from tblEmployee
+where Gender = @Gender)
+
+select * from fn_withparameters('Female')
+
+Id	Name	Gender
+3	Pam	Female
+5	Sara	Female
+
+2. Rules and Defaults cannot be associated with views.
+
+3. The ORDER BY clause is invalid in views unless TOP or FOR XML is also specified.
+Create View vWEmployeeDetailsSorted
+as
+Select Id, Name, Gender, DepartmentId
+from tblEmployee
+order by Id
+If you use ORDER BY, you will get an error stating - 
+'The ORDER BY clause is invalid in views, inline functions, derived tables, subqueries, and common table expressions, unless TOP or FOR XML is also specified.'
+
+
+4.Views cannot be based on temporary tables.
+
+Create Table ##TestTempTable(Id int, Name nvarchar(20), Gender nvarchar(10))
+
+Insert into ##TestTempTable values(101, 'Martin', 'Male')
+Insert into ##TestTempTable values(102, 'Joe', 'Female')
+Insert into ##TestTempTable values(103, 'Pam', 'Female')
+Insert into ##TestTempTable values(104, 'James', 'Male')
+
+-- Error: Cannot create a view on Temp Tables
+Create View vwOnTempTable
+as
+Select Id, Name, Gender
+from ##TestTempTable
