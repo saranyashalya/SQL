@@ -1,0 +1,28 @@
+
+#Index creation
+1. In the Object Explorer, expand the Databases folder and then specific database you are working with. 
+2. Expand the Tables folder
+3. Expand the Table on which you want to create the index
+4. Right click on the Indexes folder and select New Index
+5. In the New Index dialog box, type in a meaningful name
+6. Select the Index Type and specify Unique or Non Unique Index
+7. Click the Add
+8. Select the columns that you want to add as index key
+9 Click OK
+10. Save the table 
+
+#Dropping index
+Drop Index tblemp.Id_index
+
+The following are the different types of indexes in SQL Server
+1. Clustered
+2. Nonclustered
+3. Unique
+4. Filtered
+5. XML 
+6. Full Text
+7. Spatial
+8. Columnstore
+9. Index with included columns
+10. Index on computed columns
+

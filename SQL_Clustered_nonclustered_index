@@ -1,0 +1,91 @@
+
+#Clustered index
+
+CREATE TABLE [tblEmployee]
+(
+ [Id] int Primary Key,
+ [Name] nvarchar(50),
+ [Salary] int,
+ [Gender] nvarchar(10),
+ [City] nvarchar(50)
+)
+
+execute sp_helpindex tblEmployee
+o/p
+index_name	index_description	index_keys
+PK__tblEmplo__3214EC072E5C87E2	clustered, unique, primary key located on PRIMARY	Id
+
+
+Insert into tblEmployee Values(3,'John',4500,'Male','New York')
+Insert into tblEmployee Values(1,'Sam',2500,'Male','London')
+Insert into tblEmployee Values(4,'Sara',5500,'Female','Tokyo')
+Insert into tblEmployee Values(5,'Todd',3100,'Male','Toronto')
+Insert into tblEmployee Values(2,'Pam',6500,'Female','Sydney')
+
+select * from tblEmployee
+o/p
+Id	Name	Salary	Gender	City
+1	Sam	2500	Male	London
+2	Pam	6500	Female	Sydney
+3	John	4500	Male	New York
+4	Sara	5500	Female	Tokyo
+5	Todd	3100	Male	Toronto
+
+Inspite, of inserting the rows in a random order, when we execute the select query 
+we can see that all the rows in the table are arranged in an ascending order based on the Id column. 
+This is because a clustered index determines the physical order of data in a table, and we have got a clustered index on the Id column.
+
+
+Because of the fact that, a clustered index dictates the physical storage order of the data in a table, a table can contain only one clustered index. 
+If you take the example of tblEmployee table, the data is already arranged by the Id column, 
+and if we try to create another clustered index on the Name column, the data needs to be rearranged based on the NAME column, 
+which will affect the ordering of rows that's already done based on the ID column. 
+
+#Creating another clustered index in the same table
+Create clustered index IX_tblEmployee_name
+on tblEmployee(Name)
+o/p
+The operation failed because an index or statistics with name 'IX_tblEmployee_name' already exists on table 'tblEmployee'.
+
+For this reason, SQL server doesn't allow us to create more than one clustered index per table. 
+
+#Dropping indx
+#Need to specify tablename.index name
+Drop Index tblEmployee.PK__tblEmplo__3214EC072E5C87E2
+
+#Creating a composite cluster on two columns (Gender and Salary)
+create Clustered index IX_clustered_ind_tblemp_gen_salary
+on tblEmployee(Gender DESC, Salary ASC)
+
+# We will see that the order of the rows is in gender descending order and salary on ascending 
+select * from tblEmployee
+o/p
+Id	Name	Salary	Gender	City
+1	Sam	2500	Male	London
+5	Todd	3100	Male	Toronto
+3	John	4500	Male	New York
+4	Sara	5500	Female	Tokyo
+2	Pam	6500	Female	Sydney
+
+
+#Non Clustered Index:
+A nonclustered index is analogous to an index in a textbook. 
+The data is stored in one place, the index in another place. 
+The index will have pointers to the storage location of the data. 
+Since, the nonclustered index is stored separately from the actual data, a table can have more than one non clustered index, 
+just like how a book can have an index by Chapters at the beginning and another index by common terms at the end.
+
+In the index itself, the data is stored in an ascending or descending order of the index key, 
+which doesn't in any way influence the storage of data in the table. 
+
+#Create nonclustered index on tblEmployee in name column
+create NonClustered Index IX_tblEmployee_name
+on tblEmployee(Name)
+
+
+Difference between Clustered and NonClustered Index:
+1. Only one clustered index per table, where as you can have more than one non clustered index
+2. Clustered index is faster than a non clustered index, because, the non-clustered index has to refer back to the table, 
+if the selected column is not present in the index.
+3. Clustered index determines the storage order of rows in the table, and hence doesn't require additional disk space, 
+but where as a Non Clustered index is stored seperately from the table, additional storage space is required.
