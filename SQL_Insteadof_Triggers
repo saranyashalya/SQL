@@ -1,0 +1,97 @@
+
+
+select * from tblEmployee
+o/p
+Id	Name	Salary	Gender	DepartmentId
+1	Sara	5000	Male	3
+2	Mike	3400	Male	2
+3	Pam	6000	Female	1
+4	Todd	4800	Male	4
+5	Sara	3200	Female	1
+6	Ben	4800	Male	3
+
+select * from tblDepartment
+o/p:
+DeptId	DeptName
+1	IT
+2	Payroll
+3	HR
+4	Admin
+
+create view [dbo].[VWEmployeesByDepartment]
+as
+  select Id, Name, Salary, Gender, DeptName
+  from tblEmployee
+  inner join
+  tblDepartment
+  on tblEmployee.DepartmentId = tblDepartment.DeptId
+
+
+select * from [VWEmployeesByDepartment]
+o/p:
+Id	Name	Salary	Gender	DeptName
+1	Sara	5000	Male	HR
+2	Mike	3400	Male	Payroll
+3	Pam	6000	Female	IT
+4	Todd	4800	Male	Admin
+5	Sara	3200	Female	IT
+6	Ben	4800	Male	HR
+
+Insert into [VWEmployeesByDepartment] values(7, 'Valarie', 4500,'Female','IT')
+Msg 4405, Level 16, State 1, Line 25
+View or function 'VWEmployeesByDepartment' is not updatable because the modification affects multiple base tables.
+
+#Create trigger which will update the table directly instead of inserting in view
+create trigger tr_insteadof_insert
+on [VWEmployeesByDepartment]
+instead of insert
+as
+begin
+	declare @Deptid int
+	select @Deptid = DeptId from tblDepartment join inserted on inserted.DeptName = tblDepartment.DeptName 
+
+	if(@Deptid is null)
+		begin
+			raiserror('Invalid Dept Id',16,1)
+			return 
+		end
+
+	insert into tblEmployee(Id, Name, Salary, Gender, DepartmentId)  
+	(select Id, Name, Salary, Gender, @Deptid from inserted)
+end
+
+
+Insert into [VWEmployeesByDepartment] values(7, 'Valarie', 4500,'Female','IT')
+
+select * from tblEmployee;
+o/p
+Id	Name	Salary	Gender	DepartmentId
+1	Sara	5000	Male	3
+2	Mike	3400	Male	2
+3	Pam	6000	Female	1
+4	Todd	4800	Male	4
+5	Sara	3200	Female	1
+6	Ben	4800	Male	3
+7	Valarie	4500	Female	1
+
+
+#If we try to insert an invalid dept id, we get a msg and insert fails.
+
+Insert into [VWEmployeesByDepartment] values(8, 'Varie', 6500,'Female','abcd')
+o/p
+Msg 50000, Level 16, State 1, Procedure tr_insteadof_insert, Line 11 [Batch Start Line 47]
+Invalid Dept Id
+
+Raiserror() has 3 parameters -> 1st is the error message, second parameter is the severity level and 3rd parameter is the state. 
+
+Severity levels:
+Severity levels from 0 through 18 can be specified by any user. 
+Severity levels from 19 through 25 can only be specified by members of the sysadmin fixed server role or users with ALTER TRACE permissions. 
+For severity levels from 19 through 25, the WITH LOG option is required. Severity levels less than 0 are interpreted as 0. 
+Severity levels greater than 25 are interpreted as 25.
+
+State:
+Is an integer from 0 through 255. Negative values default to 1. Values larger than 255 should not be used.
+If the same user-defined error is raised at multiple locations, 
+using a unique state number for each location can help find which section of code is raising the errors.
+
