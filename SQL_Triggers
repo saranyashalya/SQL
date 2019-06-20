@@ -1,0 +1,126 @@
+
+In SQL server there are 3 types of triggers
+1. DML triggers 
+2. DDL triggers
+3. Logon trigger
+
+In general, a trigger is a special kind of stored procedure that automatically executes when an event occurs in the database server.
+
+DML stands for Data Manipulation Language. INSERT, UPDATE, and DELETE statements are DML statements. DML triggers are fired, when ever data is modified using INSERT, UPDATE, and DELETE events.
+
+DML triggers can be again classified into 2 types.
+1. After triggers (Sometimes called as FOR triggers)
+2. Instead of triggers
+
+# created trigger on insert records on tblEmployees table
+create trigger tr_tblEmployees_ForInsert
+on tblEmployees
+FOR insert
+as
+begin
+declare @Id int
+select @Id = Id from inserted
+insert into tblEmployeeAudit
+values ('New emp id '+ CAST(@Id as varchar(3)) + ' inserted at '  + CAST(Getdate() as nvarchar(20)))
+end
+
+Insert into tblEmployees values (6,'Tan', '2001-10-01 11:00:00', 'Female', 3, 'Yes')
+
+select * from tblEmployeeAudit
+o/p
+Id	AuditData
+1	New emp id 6 inserted at Jun 20 2019 11:56AM
+
+In the trigger, we are getting the id from inserted table. So, what is this inserted table? INSERTED table, is a special table used by DML triggers. 
+When you add a new row into tblEmployee table, a copy of the row will also be made into inserted table, which only a trigger can access. 
+You cannot access this table outside the context of the trigger. 
+The structure of the inserted table will be identical to the structure of tblEmployee table.
+
+## After / for delete trigger 
+create trigger tr_tblEmployees_fordelete
+on tblEmployees
+for delete
+as
+begin
+declare @id int
+select @id = Id from deleted
+insert into tblEmployeeAudit
+values ('Emp Id ' + cast(@id as nvarchar(5)) + ' deleted at ' + cast(GetDate() as nvarchar(20)))
+end
+
+delete from tblEmployees where Id=6
+
+select * from tblEmployeeAudit
+o/p
+Id	AuditData
+1	New emp id 6 at Jun 20 2019 11:56AM
+2	Emp Id 6 deleted at Jun 20 2019 12:01PM
+
+
+## after upate trigger
+
+create trigger tr_tblemployees_forupdate
+on tblEmployees
+for update
+as
+begin
+select * from deleted
+select * from inserted
+end
+
+update tblEmployees set Name ='Tom', Gender ='Male', Scientist ='no' where Id = 5
+o/p:
+Id	Name	DateOfBirth	Gender	DepartmentId	Scientist
+5	Sara	1978-11-29 12:59:30.670	Female	1	Yes       
+
+Id	Name	DateOfBirth	Gender	DepartmentId	Scientist
+5	Tom	1978-11-29 12:59:30.670	Male	1	no        
+
+## after update trigger and record the old and new values in audit table.
+Alter trigger tr_tblemployees_forupdate
+on tblEmployees
+for update
+as
+begin
+Declare @Id int, @OldName nvarchar(10), @NewName nvarchar(10),
+@OldGender nvarchar(10), @NewGender nvarchar(10),
+@OldScientist nvarchar(5), @NewScientist nvarchar(5)
+
+Declare @auditstring nvarchar(1000)
+
+select * into #temptable from inserted
+
+while(exists(select Id from #temptable))
+	begin
+		set @auditstring=''
+		select Top(1) @Id =Id, @NewName = Name, @NewGender = Gender, @NewScientist = Scientist from #temptable
+
+		select @OldName = Name, @OldGender = Gender, @OldScientist = Scientist from deleted where Id = @Id
+
+		set @auditstring = 'Employee Id ' + cast(@Id as nvarchar(3)) + ' changed'
+
+		if(@OldName <> @NewName)
+			set @auditstring = @auditstring + ' Name changed from ' + cast(@OldName as nvarchar(10)) + ' into ' + cast(@NewName as nvarchar(10))
+
+		if(@OldGender <> @NewGender)
+			set @auditstring = @auditstring + ' Gender changed from ' + cast(@OldGender as nvarchar(10)) + ' into ' + cast(@NewGender as nvarchar(10))
+
+		if(@OldScientist <> @NewScientist)
+			set @auditstring = @auditstring + ' Scientist change from ' + cast(@OldScientist as nvarchar(5)) + ' into ' + cast(@NewScientist as nvarchar(5))
+
+
+		insert into tblEmployeeAudit values(@auditstring)
+
+		Delete from #temptable where Id = @Id
+	end
+
+end
+
+update tblEmployees set Name ='Tanya', Gender ='Female', Scientist ='Yes' where Id = 5
+
+select * from tblEmployeeAudit
+o/p
+Id	AuditData
+1	New emp id 6 at Jun 20 2019 11:56AM
+2	Emp Id 6 deleted at Jun 20 2019 12:01PM
+3	Employee Id 5 changed Name changed from Tom into Tanya Gender changed from Male into Female Scientist change from no    into Yes  
