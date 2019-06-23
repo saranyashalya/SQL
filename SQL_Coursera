@@ -1,0 +1,467 @@
+Data Scientist Role Play: Profiling and Analyzing the Yelp Dataset Coursera Worksheet
+
+This is a 2-part assignment. In the first part, you are asked a series of questions that will help you profile and understand the data just like a data scientist would. For this first part of the assignment, you will be assessed both on the correctness of your findings, as well as the code you used to arrive at your answer. You will be graded on how easy your code is to read, so remember to use proper formatting and comments where necessary.
+
+In the second part of the assignment, you are asked to come up with your own inferences and analysis of the data for a particular research question you want to answer. You will be required to prepare the dataset for the analysis you choose to do. As with the first part, you will be graded, in part, on how easy your code is to read, so use proper formatting and comments to illustrate and communicate your intent as required.
+
+For both parts of this assignment, use this "worksheet." It provides all the questions you are being asked, and your job will be to transfer your answers and SQL coding where indicated into this worksheet so that your peers can review your work. You should be able to use any Text Editor (Windows Notepad, Apple TextEdit, Notepad ++, Sublime Text, etc.) to copy and paste your answers. If you are going to use Word or some other page layout application, just be careful to make sure your answers and code are lined appropriately.
+In this case, you may want to save as a PDF to ensure your formatting remains intact for you reviewer.
+
+
+
+Part 1: Yelp Dataset Profiling and Understanding
+
+1. Profile the data by finding the total number of records for each of the tables below:
+	
+i. Attribute table = 10000
+ii. Business table = 10000
+iii. Category table = 10000
+iv. Checkin table = 10000
+v. elite_years table = 10000
+vi. friend table = 10000
+vii. hours table = 10000
+viii. photo table = 10000
+ix. review table = 10000
+x. tip table = 10000
+xi. user table = 10000
+	
+
+
+2. Find the total distinct records by either the foreign key or primary key for each table. If two foreign keys are listed in the table, please specify which foreign key.
+
+i. Business = Primary key(id) - 10000
+ii. Hours = Foreign key(business_id) - 1562
+iii. Category = Foreign key(business_id) -2643
+iv. Attribute = Foreign key(business_id) - 1115
+v. Review = Foreign key(business_id) - 8090, Foreign key(user_id) - 9581, Primary key (id) = 10000
+vi. Checkin = Foreign key(business_id) - 493
+vii. Photo = Foreign key(business_id) - 6493
+viii. Tip = Foreign key(business_id) - 3979, Foreign key(user_id) - 537
+ix. User = Primary key(id) -10000
+x. Friend = Foreign key(user_id) - 11
+xi. Elite_years = Foreign key(user_id) - 2780
+
+Note: Primary Keys are denoted in the ER-Diagram with a yellow key icon.	
+
+
+
+3. Are there any columns with null values in the Users table? Indicate "yes," or "no."
+
+	Answer: Yes
+	
+	
+	SQL code used to arrive at answer:
+	select sql from sqlite_master where name='user'
+	
+
+	
+4. For each table and column listed below, display the smallest (minimum), largest (maximum), and average (mean) value for the following fields:
+
+	i. Table: Review, Column: Stars
+	
+		min:	1	max:	5	avg: 3.7082
+		
+	
+	ii. Table: Business, Column: Stars
+	
+		min:	1.0	max:	5.0	avg: 3.6549
+		
+	
+	iii. Table: Tip, Column: Likes
+	
+		min:	0	max: 2		avg: 0.0144
+		
+	
+	iv. Table: Checkin, Column: Count
+	
+		min:	1	max:	53	avg:1.9414
+		
+	
+	v. Table: User, Column: Review_count
+	
+		min:  0		max: 2000	avg: 24.2995
+		
+
+
+5. List the cities with the most reviews in descending order:
+
+	SQL code used to arrive at answer:
+		select count(review.id), review.business_id 
+		from review join business
+		on business.id = review.business_id group by review.business_id 
+		order by count(review.id) desc
+		
+	Copy and Paste the Result Below:
+	+------------------+------------------------+
+	| count(review.id) | business_id            |
+	+------------------+------------------------+
+	|               10 | 2weQS-RnoOBhb1KsHKyoSQ |
+	|                7 | 0AQnRQw34IQW9-1gJkYnMA |
+	|                5 | 0FUtlsQrJI7LhqDPxLumEw |
+	|                5 | 0QHMAUi6NdOUZ1ckXq0-sA |
+	|                4 | --9e1ONYQuAa-CB_Rrw7Tw |
+	|                4 | -Ylpy3VyRWwubf9dysuwjQ |
+	|                4 | 0W_pPAiTXgazY2mtX6o0_w |
+	|                3 | -rLP6lfoQmOO_5Pf2bTkqg |
+	|                3 | -yApKLEFAvvNyifvpNKWCA |
+	|                3 | 0ldxjei8v4q95fApIei3Lg |
+	|                3 | 16Fplxu-OwVmTEFxQAUP4g |
+	|                3 | 16tWXenJ1wTqugXJU7yiZg |
+	|                3 | 1FAvxOUOGGyZoYNlAXACag |
+	|                3 | 1HD5iUUfVJDbfEBIn9yVhw |
+	|                3 | 1WHM7EnTMSjteM9UEr86tA |
+	|                3 | 25wTaO0_Rk-GLb4k2uMs0Q |
+	|                3 | 2iTsRqUsPGRH1li1WVRvKQ |
+	|                3 | 2skQeu3C36VCiB653MIfrw |
+	|                3 | 2sx52lDoiEtef7xgPCaoBw |
+	|                3 | 364hhL5st0LV16UcBHRJ3A |
+	|                3 | 36GvUjLg3drdOB3jgpqTOQ |
+	|                2 | --cZ6Hhc9F7VkKXxHMVZSQ |
+	|                2 | -0tgMGl7D9B10YjSN2ujLA |
+	|                2 | -3zffZUHoY8bQjGfPSoBKQ |
+	|                2 | -7H-oXvCxJzuT42ky6Db0g |
+	+------------------+------------------------+
+	(Output limit exceeded, 25 of 507 total rows shown)
+
+	
+6. Find the distribution of star ratings to the business in the following cities:
+
+i. Avon
+
+SQL code used to arrive at answer:
+	select stars, count(stars) as count 
+	from business 
+	where business.city ='Avon' 
+	group by stars
+
+Copy and Paste the Resulting Table Below (2 columns – star rating and count):
++-------+-------+
+| stars | count |
++-------+-------+
+|   1.5 |     1 |
+|   2.5 |     2 |
+|   3.5 |     3 |
+|   4.0 |     2 |
+|   4.5 |     1 |
+|   5.0 |     1 |
+
+ii. Beachwood
+
+SQL code used to arrive at answer:
+select stars, count(stars) as count 
+from business 
+where business.city ='Beachwood' 
+group by stars
+
+Copy and Paste the Resulting Table Below (2 columns – star rating and count):
+		
++-------+-------+
+| stars | count |
++-------+-------+
+|   2.0 |     1 |
+|   2.5 |     1 |
+|   3.0 |     2 |
+|   3.5 |     2 |
+|   4.0 |     1 |
+|   4.5 |     2 |
+|   5.0 |     5 |
++-------+-------+
+
+7. Find the top 3 users based on their total number of reviews:
+		
+	SQL code used to arrive at answer:
+	select id, name, review_count 
+	from user 
+	order by review_count desc 
+	limit 3
+		
+	Copy and Paste the Result Below:
+		+------------------------+--------+--------------+
+		| id                     | name   | review_count |
+		+------------------------+--------+--------------+
+		| -G7Zkl1wIWBBmD0KRy_sCw | Gerald |         2000 |
+		| -3s52C4zL_DHRK0ULG6qtg | Sara   |         1629 |
+		| -8lbUNlXVSoXqaRRiHiSNg | Yuri   |         1339 |
+		+------------------------+--------+--------------+
+
+
+8. Does posing more reviews correlate with more fans?
+
+	Please explain your findings and interpretation of the results:
+	No, review count is not correlated with fans. For the top 3 review counts, we are not seeing the highest fans. 
+	
+	+------------------------+--------+--------------+------+
+	| id                     | name   | review_count | fans |
+	+------------------------+--------+--------------+------+
+	| -G7Zkl1wIWBBmD0KRy_sCw | Gerald |         2000 |  253 |
+	| -3s52C4zL_DHRK0ULG6qtg | Sara   |         1629 |   50 |
+	| -8lbUNlXVSoXqaRRiHiSNg | Yuri   |         1339 |   76 |
+	+------------------------+--------+--------------+------+
+
+	maximum fans is 503.
+	+-----------+
+	| max(fans) |
+	+-----------+
+	|       503 |
+	+-----------+
+		
+9. Are there more reviews with the word "love" or with the word "hate" in them?
+
+	Answer:
+	Yes, more reviews with word 'love'
+	
+	SQL code used to arrive at answer:
+	select count(text) 
+	from review 
+	where text like '%love%'
+	+-------------+
+	| count(text) |
+	+-------------+
+	|        1780 |
+	+-------------+
+		
+	select count(text) from review where text like '%hate%'
+	
+	+-------------+
+	| count(text) |
+	+-------------+
+	|         232 |
+	+-------------+
+10. Find the top 10 users with the most fans:
+
+	SQL code used to arrive at answer:
+	select name, count(fans) as fans_count from user 
+	group by name
+	order by count(fans) desc
+	limit 10
+	
+	Copy and Paste the Result Below:
+	+----------+------------+
+	| name     | fans_count |
+	+----------+------------+
+	| John     |        102 |
+	| David    |         90 |
+	| Chris    |         74 |
+	| Mike     |         74 |
+	| Michael  |         72 |
+	| Jennifer |         63 |
+	| Mark     |         59 |
+	| Lisa     |         58 |
+	| Melissa  |         58 |
+	| Sarah    |         55 |
++----------+------------+
+	
+	
+11. Is there a strong relationship (or correlation) between having a high number of fans and being listed as "useful" or "funny?" 
+Out of the top 10 users with the highest number of fans, what percent are also listed as “useful” or “funny”?
+
+Key:
+0% - 25% - Low relationship
+26% - 75% - Medium relationship
+76% - 100% - Strong relationship
+	
+	SQL code used to arrive at answer:
+	select name, count(fans) as fans_count 
+	from user
+	where useful >0 OR funny >0
+	group by name 
+	order by count(fans) desc 
+	limit 10
+	
+	Copy and Paste the Result Below:
+	+----------+------------+
+	| name     | fans_count |
+	+----------+------------+
+	| John     |         51 |
+	| David    |         43 |
+	| Michael  |         33 |
+	| Mike     |         33 |
+	| Sarah    |         32 |
+	| Chris    |         30 |
+	| Melissa  |         29 |
+	| Jennifer |         28 |
+	| Lisa     |         28 |
+	| Andrew   |         25 |
+	+----------+------------+
+	
+	Please explain your findings and interpretation of the results:
+	Out of top 10 users with highest fans count, I could see medium relationship between having high fans count and useful or funny. 
+	Almost 50% of fans count are with useful and funny as compared to the original fans count.
+	
+	
+
+Part 2: Inferences and Analysis
+
+1. Pick one city and category of your choice and group the businesses in that city or category by their overall star rating. 
+Compare the businesses with 2-3 stars to the businesses with 4-5 stars and answer the following questions. Include your code.
+	
+	select stars, count(stars), name from business join category
+	on business.id = category.business_id
+	where city = 'Toronto' and category ='Food'
+	group by stars, name
+
+i. Do the two groups you chose to analyze have a different distribution of hours?
+	No, it is same.
+		+-------+--------------+--------------------+---------+
+	| stars | count(stars) | name               | is_open |
+	+-------+--------------+--------------------+---------+
+	|   2.5 |            1 | Loblaws            |       1 |
+	|   3.5 |            1 | The Kosher Gourmet |       1 |
+	|   4.0 |            1 | Halo Brewery       |       1 |
+	|   4.5 |            1 | Cabin Fever        |       1 |
+	+-------+--------------+--------------------+---------+
+
+ii. Do the two groups you chose to analyze have a different number of reviews?
+        yes, different number of reviews
+
++-------+--------------+--------------------+---------+--------------+
+| stars | count(stars) | name               | is_open | review_count |
++-------+--------------+--------------------+---------+--------------+
+|   2.5 |            1 | Loblaws            |       1 |           10 |
+|   3.5 |            1 | The Kosher Gourmet |       1 |            3 |
+|   4.0 |            1 | Halo Brewery       |       1 |           15 |
+|   4.5 |            1 | Cabin Fever        |       1 |           26 |
++-------+--------------+--------------------+---------+--------------+		
+         
+iii. Are you able to infer anything from the location data provided between these two groups? Explain.
+
+SQL code used for analysis:
+lattitude and longitude is same.
+
+select latitude, longitude from business where name in ('Loblaws' , 'Halo Brewery')
++----------+-----------+
+| latitude | longitude |
++----------+-----------+
+|  43.6551 |  -79.4494 |
+|  43.6618 |  -79.4466 |
+|  43.6992 |  -79.3597 |
++----------+-----------+	
+		
+2. Group business based on the ones that are open and the ones that are closed. What differences can you find between the ones that are still open and the ones that are closed? 
+List at least two differences and the SQL code you used to arrive at your answer.
+		
+i. Difference 1:
+	the average review count for the closed ones is lower than the ones which are open.
+
+ii. Difference 2:
+     There is difference in the states that are open and that are closed
+		
+         
+SQL code used for analysis:
+
+	Difference 1:
+	     select avg(review_count) from business where is_open=0
+		
+		+-------------------+
+		| avg(review_count) |
+		+-------------------+
+		|     23.1980263158 |
+		+-------------------+
+	
+     select avg(review_count) from business where is_open=1
+		+-------------------+
+		| avg(review_count) |
+		+-------------------+
+		|     31.7570754717 |
+		+-------------------+
+	
+	Differene 2:
+	
+	select distinct(state) from business where is_open=1
+		+-------+
+		| state |
+		+-------+
+		| ON    |
+		| NC    |
+		| AZ    |
+		| NV    |
+		| PA    |
+		| OH    |
+		| EDH   |
+		| BW    |
+		| IL    |
+		| WI    |
+		| QC    |
+		| SC    |
+		| MLN   |
+		| ELN   |
+		| WLN   |
+		| NI    |
+		| C     |
+		| HLD   |
+		| NY    |
+		| FIF   |
+		| NYK   |
+		| ST    |
+		| ESX   |
+		+-------+
+        
+		select distinct(state) from business where is_open=0
+		 
+		 +-------+
+		| state |
+		+-------+
+		| AZ    |
+		| NV    |
+		| WI    |
+		| ON    |
+		| EDH   |
+		| PA    |
+		| OH    |
+		| QC    |
+		| IL    |
+		| NC    |
+		| MLN   |
+		| BW    |
+		| SC    |
+		| HLD   |
+		| NI    |
+		| ELN   |
+		+-------+
+		
+3. For this last part of your analysis, you are going to choose the type of analysis you want to conduct on the Yelp dataset and are going to prepare the data for analysis.
+
+Ideas for analysis include: Parsing out keywords and business attributes for sentiment analysis, clustering businesses to find commonalities or anomalies between them, 
+predicting the overall star rating for a business, predicting the number of fans a user will have, and so on. These are just a few examples to get you started, 
+so feel free to be creative and come up with your own problem you want to solve. Provide answers, in-line, to all of the following:
+	
+i. Indicate the type of analysis you chose to do:
+    Analysis on review text between two business.     
+         
+ii. Write 1-2 brief paragraphs on the type of data you will need for your analysis and why you chose that data:
+       Review text and business data from the business and review table is used  for the analysis on the review text                    
+                  
+iii. Output of your finished dataset:
+     +-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------------+
+| text                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | name                      |
++-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------------+
+| I Like this place...great service, comfy lounge, and great music. On Tuesday there was a 2 drink minimum to sit in the lounge, one of my Friends was forced to leave which was not very nice, other than that i was happy our hotel gave us a 2 for 1 drink coupon...can't complain!!!!                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       | Heart Bar                 |
+| It is overpriced.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | Heart Bar                 |
+| Weird guys milling around.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |                           |
+| The seats are not steam cleaned.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |                           |
+| Kids should not be near said one reviewer.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |                           |
+|                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |                           |
+| For goodness sake this is Las Vegas! Kids should not be in the bloody casino!                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |                           |
+| Enjoy heart for what it is. Entertainment and cold drinks.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |                           |
+| I went here twice and after leaving with a "eh" feeling after both visits decided it was time to switch to another dermatologist.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | Linda Woodson Dermatology |
+|                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |                           |
+| My first visit I specifically requested Dr. Woodson herself after reading a lot of neutral to negative reviews for her PA and NP. After filling out a ton of paperwork (most of which was not very welcoming- I think I signed about three different forms promising I would definitely pay my bill or be sent to a debt collector. I get they want their money, but what a way to greet your new patients!) I went into the exam room and lo and behold PA John Notabartolo walks into the room. Since I was already there I just went with it. He examined my skin (I went in for some mild adult acne) for less than ten seconds, told me basic skin care advice that I've known about for years, and then wrote me some prescriptions. The whole visit with him lasted about three minutes. No real suggestions or overview of my current skin care regime, no explanation of the possible cause of my condition or what level of severity it was. Basically the only thing I couldn't have found on my own online was the prescriptions. |                           |
+|                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |                           |
+| As another reviewer noted, they tend to prescribe the newest brand name drugs and of course both of mine were brand name and expensive! Thankfully my insurance covered mine with a reasonable co-pay, but definitely double check with your insurance before getting them filled. The prescriptions did help my skin, which was awesome. I went back for a follow up as they'd requested to see me in a few weeks and after waiting for over forty minutes past my appointment time was taken back with very little apology for the wait. Again another three minute visit with the PA with another very hurried skin examination and I left wondering why I'd wasted two hours of my time and another doctor's bill.                                                                                                                                                                                                                                                                                                                        |                           |
+|                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |                           |
+| Only one lady at the front desk was very friendly; everyone one else in the office seemed less than thrilled to be there. They did call with appointment reminders, which was nice, however the first time they left a voicemail with the time but not the date, and the second time they left a voicemail with one time and then called back and left another voicemail with a different time. Their bills also have the quickest due date I have ever seen. They give you 10 days from when they print the bill until the due date- but they seem to take 1-2 days to mail the bill (so 8 days left), plus 1-2 days in the mail (6 days left), so by the time you get it you have about 4-5 days to get it in the mail to make sure it arrives on time. You better hope you're not on vacation when they send the bill!                                                                                                                                                                                                                     |                           |
+|                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |                           |
+| The last in the chain of events to make me move on to a new doctor was when I called to reschedule my third appointment and was put on hold for 7 minutes and then was greeted by a bored sounding woman who barely apologized for the wait. Instead of rescheduling I just asked her to cancel. I hung up and smiled as I realized I'd successfully broken up with my doctor.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |                           |
+|                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |                           |
+| Nothing this office did was horrible, but nothing they did was great either. The little moments of what I consider mediocre medical care and blase customer service just added up for me to the point where I didn't want to deal with it anymore. There's plenty of dermatology offices in this city and given the low reviews dating back for years I feel like this office isn't that interested in improving their business- so I'll just take mine elsewhere.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |                           |
++-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------------+    
+         
+iv. Provide the SQL code you used to create your final dataset:
+	select review.text, business.name from review join business
+	on review.business_id = business.id 
+	where business.name like '%Heart Bar%'
+	
+	select review.text, business.name from review join business
+	on review.business_id = business.id 
+	where business.name like '%Linda Woodson Dermatology%'
+
