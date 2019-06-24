@@ -1,0 +1,91 @@
+##CTE on single table
+
+with cte_singletable
+as
+(Select Name, Gender from tblEmployee)
+select * from cte_singletable
+o/p
+Name	Gender
+Sara	Male
+Mike	Male
+Pam	Female
+Todd	Male
+Sara	Female
+Ben	Male
+Valarie	Female
+
+#Updating CTE which affects one base table. (successful)
+with cte_singletable
+as
+(Select Name, Gender from tblEmployee)
+update cte_singletable set Gender ='Female' where Name='Mike'
+
+#Successfully updated
+select * from tblEmployee
+o/p
+Id	Name	Salary	Gender	DepartmentId
+1	Sara	5000	Male	3
+2	Mike	3400	Female	2
+3	Pam	6000	Female	1
+4	Todd	4800	Male	4
+5	Sara	3200	Female	1
+6	Ben	4800	Male	3
+7	Valarie	4500	Female	1
+
+##CTE with multiple table
+with cte_multipletable
+as
+(select Name, Gender, DeptName
+from tblemployee join tblDepartment
+ on tblEmployee.DepartmentId = tblDepartment.DeptId 
+ )
+select * from cte_multipletable
+
+o/p
+Name	Gender	DeptName
+Sara	Male	HR
+Mike	Female	Payroll
+Pam	Female	IT
+Todd	Male	Admin
+Sara	Female	IT
+Ben	Male	HR
+Valarie	Female	IT
+
+##update cte which affects only one table (successful)
+with cte_multipletable
+as
+(select Name, Gender, DeptName
+from tblemployee join tblDepartment
+ on tblEmployee.DepartmentId = tblDepartment.DeptId 
+ )
+update cte_multipletable set Gender ='Male' where Name='Mike'
+
+o/p
+Id	Name	Salary	Gender	DepartmentId
+1	Sara	5000	Male	3
+2	Mike	3400	Male	2
+3	Pam	6000	Female	1
+4	Todd	4800	Male	4
+5	Sara	3200	Female	1
+6	Ben	4800	Male	3
+7	Valarie	4500	Female	1
+
+
+##Update CTE which affects multiple tables (Failed)
+
+with cte_multipletable
+as
+(select Name, Gender, DeptName
+from tblemployee join tblDepartment
+ on tblEmployee.DepartmentId = tblDepartment.DeptId 
+ )
+update cte_multipletable set Gender ='Male', DeptName='IT' where Name='Mike'
+
+o/p:
+Msg 4405, Level 16, State 1, Line 44
+View or function 'cte_multipletable' is not updatable because the modification affects multiple base tables.
+
+So in short if, 
+1. A CTE is based on a single base table, then the UPDATE suceeds and works as expected.
+2. A CTE is based on more than one base table, and if the UPDATE affects multiple base tables, the update is not allowed and the statement terminates with an error.
+3. A CTE is based on more than one base table, and if the UPDATE affects only one base table, the UPDATE succeeds(but not as expected always)
