@@ -1,0 +1,42 @@
+
+##Simple way to get emp name and manager name
+  select e.Name, isnull(m.Name ,'Super Boss') as 'Manager Name'
+  from tblemp e left join tblemp m
+  on m.EmployeeId = e.ManagerId
+  
+o/p
+Name	Manager Name
+Mike	Todd
+Rob	Mike
+Todd	Super Boss
+Ben	Mike
+Sam	Mike
+
+##Using recursive CTE
+with employeeCTE(EmployeeID, Name, ManagerId, [Level])
+as
+(
+select EmployeeId, Name, ManagerId, 1
+from tblemp where ManagerId is null
+union all
+select tblemp.employeeid, tblemp.Name, tblemp.ManagerID, employeeCTE.[Level]+1
+from tblemp join employeeCTE
+on tblemp.ManagerID = employeeCTE.EmployeeID
+) 
+select EmpCTE.Name as Employee, Isnull(MgrCTE.Name,'Super Boss') as Manager,
+EmpCTE.[Level] 
+from employeeCTE EmpCTE left join employeeCTE MgrCTE
+on EmpCTE.ManagerId = MgrCTE.EmployeeID
+
+o/p:
+Employee	Manager	Level
+Todd	Super Boss	1
+Mike	Todd	2
+Rob	Mike	3
+Ben	Mike	3
+Sam	Mike	3
+
+The EmployeesCTE contains 2 queries with UNION ALL operator. The first query selects the EmployeeId, Name, ManagerId, and 1 as the level from tblEmployee where ManagerId is NULL. 
+So, here we are giving a LEVEL = 1 for super boss (Whose Manager Id is NULL). 
+In the second query, we are joining tblEmployee with EmployeesCTE itself, which allows us to loop thru the hierarchy.
+Finally to get the reuired output, we are joining EmployeesCTE with itself. 
