@@ -1,0 +1,79 @@
+###We will also explore the differences between Views, Table Variable, Local and Global Temp Tables, Derived tables and common table expressions. 
+###Now, we want to write a query which would return the following output. The query should return, the Department Name and Total Number of employees, with in the department.
+### The departments with greatar than or equal to 2 employee should only be returned.
+
+##Using view
+ Create view vW_empcount
+ as
+ select DeptName, DeptId , count(*) as totalemp 
+ from tblEmployee join tblDepartment
+ on tblEmployee.DepartmentId = tblDepartment.DeptId
+ group by DeptName, DeptId
+
+
+select DeptName, totalemp from vW_empcount where totalemp >=2
+o/p
+DeptName	totalemp
+IT	3
+HR	2
+
+##Using temporary table
+select DeptName, DeptId, count(*) as totalemp 
+into #tempempcounttbl
+from tblEmployee join tblDepartment
+on tblEmployee.DepartmentId = tblDepartment.DeptId
+group by DeptName, DeptId
+
+select DeptName, totalemp from #tempempcounttbl where totalemp >=2 
+o/p
+DeptName	totalemp
+IT	3
+HR	2
+
+##Using table variable
+Declare @tblempcount TABLE
+(DeptName nvarchar(20), DeptId int, totalemp int)
+go
+
+insert into @tblempcount(DeptName, DeptId, totalemp)
+ select DeptName, DeptId , count(*) as totalemp 
+ from tblEmployee join tblDepartment
+ on tblEmployee.DepartmentId = tblDepartment.DeptId
+ group by DeptName, DeptId;
+o/p
+DeptName	totalemp
+IT	3
+HR	2
+
+##using derived table
+ select DeptName, totalemp from
+ ( select DeptName, DeptId , count(*) as totalemp 
+ from tblEmployee join tblDepartment
+ on tblEmployee.DepartmentId = tblDepartment.DeptId
+ group by DeptName, DeptId ) as tblempcount where totalemp >=2
+
+o/p
+DeptName	totalemp
+IT	3
+HR	2
+
+#CTE - Common Table Expressions
+With EmployeeCount
+(DeptName, DeptId, totalemp)
+as
+(
+ select DeptName, DeptId , count(*) as totalemp 
+ from tblEmployee join tblDepartment
+ on tblEmployee.DepartmentId = tblDepartment.DeptId
+ group by DeptName, DeptId
+)
+Select DeptName, totalemp
+from EmployeeCount
+where totalemp >= 2
+
+o/p
+DeptName	totalemp
+IT	3
+HR	2
+ 
+ 
