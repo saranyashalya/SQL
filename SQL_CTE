@@ -1,0 +1,72 @@
+
+##CTE
+
+With totalempcount(DeptName, totalemp)
+as
+(select DeptName, count(*) as totalemp
+from tblemployee join tblDepartment
+ on tblEmployee.DepartmentId = tblDepartment.DeptId
+ group by DeptName)
+ select DeptName, totalemp from totalempcount
+
+o/p
+DeptName	totalemp
+Admin	1
+HR	2
+IT	3
+Payroll	1
+
+#syntax:
+
+WITH cte_name (Column1, Column2, ..)
+AS
+( CTE_query )
+SQL query using CTE
+
+
+The CTE column names and CTE query column names can be different. Infact, CTE column names are optional. 
+However, if you do specify, the number of CTE columns and the CTE SELECT query columns should be same. 
+Otherwise you will get an error stating - 'EmployeeCount has fewer columns than were specified in the column list'. 
+
+##
+Remember, a CTE can only be referenced by a SELECT, INSERT, UPDATE, or DELETE statement, that immediately follows the CTE. 
+If you try to do something else in between, we get an error stating - 'Common table expression defined but not used'. 
+The following SQL, raise an error.
+
+With totalempcount(DeptName, totalemp)
+as
+(select DeptName, count(*) as totalemp
+from tblemployee join tblDepartment
+ on tblEmployee.DepartmentId = tblDepartment.DeptId
+ group by DeptName)
+  select 'hi'
+   select DeptName, totalemp from totalempcount
+
+o/p
+Msg 422, Level 16, State 4, Line 30
+Common table expression defined but not used.
+
+
+##Multiple CTE together
+
+
+With totalempcount(DeptName, totalemp)
+as
+(select DeptName, count(*) as totalemp
+from tblemployee join tblDepartment
+ on tblEmployee.DepartmentId = tblDepartment.DeptId where DeptName='IT'
+ group by DeptName ),
+ totalempcount_HRdept(DeptName, totalemp)
+ as
+ (select DeptName, count(*) as totalemp
+from tblemployee join tblDepartment
+ on tblEmployee.DepartmentId = tblDepartment.DeptId where DeptName='HR'
+ group by DeptName )
+   select DeptName, totalemp from totalempcount
+   union
+   select DeptName, totalemp from totalempcount_HRdept
+   
+o/p:
+DeptName	totalemp
+HR	2
+IT	3   
