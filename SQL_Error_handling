@@ -1,0 +1,167 @@
+
+Create Table tblProduct
+(
+ ProductId int NOT NULL primary key,
+ Name nvarchar(50),
+ UnitPrice int,
+ QtyAvailable int
+)
+
+
+Insert into tblProduct values(1, 'Laptops', 2340, 100)
+Insert into tblProduct values(2, 'Desktops', 3467, 50)
+
+select * from tblProduct
+o/p
+ProductId	Name	UnitPrice	QtyAvailable
+1	Laptops	2340	100
+2	Desktops	3467	50
+
+
+Create Table tblProductSales
+(
+ ProductSalesId int primary key,
+ ProductId int,
+ QuantitySold int
+) 
+
+
+#Procedure to check if the quantity to sell is available in stock if not, throw error ..if available, then reduce the quantity from stock and 
+
+
+create Procedure spSellProduct
+@Productid int,
+@Quantitytosell int
+as
+begin
+	declare @Stockavailable int
+	select @Stockavailable = QtyAvailable 
+	from tblProduct
+	where ProductId = @Productid
+
+	if (@Stockavailable < @Quantitytosell) 
+		begin
+		Raiserror('Stock not available',16,1)
+		end
+	else
+		begin
+			begin tran
+		
+			--first reduce the quantity available
+			update tblProduct set QtyAvailable = (QtyAvailable - @Quantitytosell) 
+			where ProductId = @Productid
+
+			--calculate maxproductsales id
+			declare @MaxProductsales int
+			Select @MaxProductsales = case when max(ProductSalesId) is null then 0
+										else max(ProductSalesId) end from tblProductSales
+
+			set @MaxProductsales = @MaxProductsales + 1
+
+			insert into tblProductSales values(@MaxProductsales, @Productid , @Quantitytosell)
+			commit tran
+		end
+end
+
+exec spSellProduct 1,200
+o/p
+Stock not available
+
+##second iteration 
+exec spSellProduct 1,50
+
+select * from tblProduct
+o/p
+ProductId	Name	UnitPrice	QtyAvailable
+1	Laptops	2340	50
+2	Desktops	3467	50
+
+select * from tblProductSales
+o/p
+ProductSalesId	ProductId	QuantitySold
+1	1	50
+
+
+#Instead of committing the transaction, we can check the status of @@ERROR variable which will carry the status of previously executed variable. 
+# If it is 0, then it is fine, else, we will have to 
+
+Alter Procedure spSellProduct
+@Productid int,
+@Quantitytosell int
+as
+begin
+	declare @Stockavailable int
+	select @Stockavailable = QtyAvailable 
+	from tblProduct
+	where ProductId = @Productid
+
+	if (@Stockavailable < @Quantitytosell) 
+		begin
+		Raiserror('Stock not available',16,1)
+		end
+	else
+		begin
+			begin tran
+		
+			--first reduce the quantity available
+			update tblProduct set QtyAvailable = (QtyAvailable - @Quantitytosell) 
+			where ProductId = @Productid
+
+			--calculate maxproductsales id
+			declare @MaxProductsales int
+			Select @MaxProductsales = case when max(ProductSalesId) is null then 0
+										else max(ProductSalesId) end from tblProductSales
+
+			set @MaxProductsales = @MaxProductsales + 1
+
+			insert into tblProductSales values(@MaxProductsales, @Productid , @Quantitytosell)
+			
+			if(@@ERROR <>0)
+				begin
+				rollback tran
+				print('Transaction Rollbacked')
+				end
+			else
+				begin
+				commit tran
+				print('Transaction commited')
+				end
+		end
+end
+
+## we are checking status of insert statement and then printing. 
+Insert into tblProduct values(2, 'Mobile Phone', 1500, 100)
+if(@@ERROR <> 0)
+ Print 'Error Occurred'
+Else
+ Print 'No Errors'
+ 
+o/p:
+Error Occurred
+
+## executing select statement inbetween the violating statement, will make @@ERROR variable 0
+ Insert into tblProduct values(2, 'Mobile Phone', 1500, 100)
+--At this point @@ERROR will have a NON ZERO value 
+Select * from tblProduct
+--At this point @@ERROR gets reset to ZERO, because the 
+--select statement successfullyexecuted
+if(@@ERROR <> 0)
+ Print 'Error Occurred'
+Else
+ Print 'No Errors'
+o/p:
+No Errors
+
+
+#saving error value in a variable and based on that deciding what to print
+ Declare @Error int
+Insert into tblProduct values(2, 'Mobile Phone', 1500, 100)
+Set @Error = @@ERROR
+Select * from tblProduct
+if(@Error <> 0)
+ Print 'Error Occurred'
+Else
+ Print 'No Errors' 
+ 
+o/p:
+Error Occurred
