@@ -1,0 +1,62 @@
+##Error handling in sql server 2005 or later
+
+Syntax:
+BEGIN TRY
+     { Any set of SQL statements }
+END TRY
+BEGIN CATCH
+     [ Optional: Any set of SQL statements ]
+END CATCH
+[Optional: Any other SQL Statements]
+
+
+Alter Procedure spSellProduct
+@Productid int,
+@Quantitytosell int
+as
+begin
+	declare @Stockavailable int
+	select @Stockavailable = QtyAvailable 
+	from tblProduct
+	where ProductId = @Productid
+
+	if (@Stockavailable < @Quantitytosell) 
+		begin
+		Raiserror('Stock not available',16,1)
+		end
+	else
+		begin
+		begin try
+			begin tran
+		
+			--first reduce the quantity available
+			update tblProduct set QtyAvailable = (QtyAvailable - @Quantitytosell) 
+			where ProductId = @Productid
+
+			--calculate maxproductsales id
+			declare @MaxProductsales int
+			Select @MaxProductsales = case when max(ProductSalesId) is null then 0
+										else max(ProductSalesId) end from tblProductSales
+
+			## To trigger primary constrainst violation eror, removing the prodsales id incrementation.
+			--set @MaxProductsales = @MaxProductsales + 1
+
+			insert into tblProductSales values(@MaxProductsales, @Productid , @Quantitytosell)
+			commit tran
+		end try
+		begin catch
+			Rollback transaction
+			select ERROR_NUMBER() as Errornumber, ERROR_MESSAGE() as Errormsg , ERROR_LINE() as Errorline, 
+			ERROR_PROCEDURE() as Errorproc, ERROR_SEVERITY() as Errorsev, ERROR_STATE() as Errorstate 
+		end catch
+		end
+end
+
+
+exec spSellProduct 1,5
+
+o/p
+Errornumber	Errormsg	Errorline	Errorproc	Errorsev	Errorstate
+2627	Violation of PRIMARY KEY constraint 'PK__tblProdu__1B97309EF5E0F496'. Cannot insert duplicate key in object 'dbo.tblProductSales'. The duplicate key value is (4).	31	spSellProduct	14	1
+
+
