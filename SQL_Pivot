@@ -1,0 +1,155 @@
+
+Create Table tblProductSales
+(
+ SalesAgent nvarchar(50),
+ SalesCountry nvarchar(50),
+ SalesAmount int 
+)
+
+Insert into tblProductSales values('Tom', 'UK', 200)
+Insert into tblProductSales values('John', 'US', 180)
+Insert into tblProductSales values('John', 'UK', 260)
+Insert into tblProductSales values('David', 'India', 450)
+Insert into tblProductSales values('Tom', 'India', 350)
+Insert into tblProductSales values('David', 'US', 200)
+Insert into tblProductSales values('Tom', 'US', 130)
+Insert into tblProductSales values('John', 'India', 540)
+Insert into tblProductSales values('John', 'UK', 120)
+Insert into tblProductSales values('David', 'UK', 220)
+Insert into tblProductSales values('John', 'UK', 420)
+Insert into tblProductSales values('David', 'US', 320)
+Insert into tblProductSales values('Tom', 'US', 340)
+Insert into tblProductSales values('Tom', 'UK', 660)
+Insert into tblProductSales values('John', 'India', 430)
+Insert into tblProductSales values('David', 'India', 230)
+Insert into tblProductSales values('David', 'India', 280)
+Insert into tblProductSales values('Tom', 'UK', 480)
+Insert into tblProductSales values('John', 'US', 360)
+Insert into tblProductSales values('David', 'UK', 140)
+
+
+select * from tblProductSales
+
+
+Select SalesCountry, SalesAgent, sum(SalesAmount) as total
+from tblProductSales
+group by SalesCountry, SalesAgent
+order by SalesCountry, SalesAgent
+
+o/p:
+SalesCountry	SalesAgent	total
+India	David	960
+India	John	970
+India	Tom	350
+UK	David	360
+UK	John	800
+UK	Tom	1340
+US	David	520
+US	John	540
+US	Tom	470
+
+
+Select SalesAgent, India, US, UK 
+from tblProductSales
+Pivot 
+(
+   Sum(SalesAmount) for SalesCountry in ([India],[US],[UK])
+) as PivotTable
+
+  
+o/p:
+SalesAgent	India	US	UK
+David	960	520	360
+John	970	540	800
+Tom	350	470	1340
+
+The syntax of PIVOT operator from MSDN
+SELECT <non-pivoted column>,
+    [first pivoted column] AS <column name>,
+    [second pivoted column] AS <column name>,
+    ...
+    [last pivoted column] AS <column name>
+FROM
+    (<SELECT query that produces the data>) 
+    AS <alias for the source query>
+PIVOT
+(
+    <aggregation function>(<column being aggregated>)
+FOR 
+    [<column that contains the values that will become column headers>] 
+    IN ( [first pivoted column], [second pivoted column], ... [last pivoted column])
+) 
+AS <alias for the pivot table>
+<optional ORDER BY clause>; 
+
+
+
+##If there is id column and if that should not be included in the pivot,
+Create Table tblProductsSale
+(
+   Id int primary key,
+   SalesAgent nvarchar(50),
+   SalesCountry nvarchar(50),
+   SalesAmount int 
+)
+
+Insert into tblProductsSale values(1, 'Tom', 'UK', 200)
+Insert into tblProductsSale values(2, 'John', 'US', 180)
+Insert into tblProductsSale values(3, 'John', 'UK', 260)
+Insert into tblProductsSale values(4, 'David', 'India', 450)
+Insert into tblProductsSale values(5, 'Tom', 'India', 350)
+Insert into tblProductsSale values(6, 'David', 'US', 200)
+Insert into tblProductsSale values(7, 'Tom', 'US', 130)
+Insert into tblProductsSale values(8, 'John', 'India', 540)
+Insert into tblProductsSale values(9, 'John', 'UK', 120)
+Insert into tblProductsSale values(10, 'David', 'UK', 220)
+Insert into tblProductsSale values(11, 'John', 'UK', 420)
+Insert into tblProductsSale values(12, 'David', 'US', 320)
+Insert into tblProductsSale values(13, 'Tom', 'US', 340)
+Insert into tblProductsSale values(14, 'Tom', 'UK', 660)
+Insert into tblProductsSale values(15, 'John', 'India', 430)
+Insert into tblProductsSale values(16, 'David', 'India', 230)
+Insert into tblProductsSale values(17, 'David', 'India', 280)
+Insert into tblProductsSale values(18, 'Tom', 'UK', 480)
+Insert into tblProductsSale values(19, 'John', 'US', 360)
+Insert into tblProductsSale values(20, 'David', 'UK', 140)
+
+select * from tblProductsSale
+o/p
+Id	SalesAgent	SalesCountry	SalesAmount
+1	Tom	UK	200
+2	John	US	180
+3	John	UK	260
+4	David	India	450
+5	Tom	India	350
+6	David	US	200
+7	Tom	US	130
+8	John	India	540
+9	John	UK	120
+10	David	UK	220
+11	John	UK	420
+12	David	US	320
+13	Tom	US	340
+14	Tom	UK	660
+15	John	India	430
+16	David	India	230
+17	David	India	280
+18	Tom	UK	480
+19	John	US	360
+20	David	UK	140
+
+Select SalesAgent, India, US, UK
+from 
+(
+Select SalesAgent, SalesCountry, SalesAmount from tblProductsSale
+) as SourceTable
+pivot
+(
+sum(SalesAmount) for SalesCountry in (India, US, UK)
+) as PivotTable
+
+o/p:
+SalesAgent	India	US	UK
+David	960	520	360
+John	970	540	800
+Tom	350	470	1340
