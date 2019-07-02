@@ -1,0 +1,157 @@
+##Cubes in SQL server
+##Cube() in SQL Server produces the result set by generating all combinations of columns specified in GROUP BY CUBE().  
+
+SELECT TOP (1000) [Id]
+      ,[Name]
+      ,[Salary]
+      ,[Gender]
+      ,[DepartmentId]
+  FROM [sample].[dbo].[tblEmployee]
+
+o/p:
+Id	Name	Salary	Gender	DepartmentId
+1	Sara	5000	Male	3
+2	Mike	3400	Male	2
+3	Pam	6000	Female	1
+4	Todd	4800	Male	4
+5	Sara	3200	Female	1
+6	Ben	4800	Male	3
+7	Valarie	4500	Female	1
+
+ Select * from tblDepartment
+o/p:
+DeptId	DeptName
+1	IT
+2	Payroll
+3	HR
+4	Admin
+
+
+
+ Select e.Name,  d.DeptName , sum(Salary) 
+ from tblEmployee e join tblDepartment d
+ on e.DepartmentId = d.DeptId
+ group by cube (e.Name,  d.DeptName)
+ 
+ o/p:
+ Name	DeptName	(No column name)
+Todd	Admin	4800
+NULL	Admin	4800
+Ben	HR	4800
+Sara	HR	5000
+NULL	HR	9800
+Pam	IT	6000
+Sara	IT	3200
+Valarie	IT	4500
+NULL	IT	13700
+Mike	Payroll	3400
+NULL	Payroll	3400
+NULL	NULL	31700
+Ben	NULL	4800
+Mike	NULL	3400
+Pam	NULL	6000
+Sara	NULL	8200
+Todd	NULL	4800
+Valarie	NULL	4500
+
+  Select e.Name,  d.DeptName , sum(Salary) 
+ from tblEmployee e join tblDepartment d
+ on e.DepartmentId = d.DeptId
+ group by e.Name,  d.DeptName with Cube
+
+o/p:
+Name	DeptName	(No column name)
+Todd	Admin	4800
+NULL	Admin	4800
+Ben	HR	4800
+Sara	HR	5000
+NULL	HR	9800
+Pam	IT	6000
+Sara	IT	3200
+Valarie	IT	4500
+NULL	IT	13700
+Mike	Payroll	3400
+NULL	Payroll	3400
+NULL	NULL	31700
+Ben	NULL	4800
+Mike	NULL	3400
+Pam	NULL	6000
+Sara	NULL	8200
+Todd	NULL	4800
+Valarie	NULL	4500
+
+ Select e.Name,  d.DeptName , sum(Salary) 
+ from tblEmployee e join tblDepartment d
+ on e.DepartmentId = d.DeptId
+ group by
+ grouping sets(
+	 (e.Name, d.DeptName),
+	 (e.Name),
+	 (d.DeptName),
+	 ()
+ )
+
+o/P:
+Name	DeptName	(No column name)
+Todd	Admin	4800
+NULL	Admin	4800
+Ben	HR	4800
+Sara	HR	5000
+NULL	HR	9800
+Pam	IT	6000
+Sara	IT	3200
+Valarie	IT	4500
+NULL	IT	13700
+Mike	Payroll	3400
+NULL	Payroll	3400
+NULL	NULL	31700
+Ben	NULL	4800
+Mike	NULL	3400
+Pam	NULL	6000
+Sara	NULL	8200
+Todd	NULL	4800
+Valarie	NULL	4500
+
+ Select e.Name,  d.DeptName , sum(Salary) 
+ from tblEmployee e join tblDepartment d
+ on e.DepartmentId = d.DeptId
+ group by e.Name, d.DeptName
+
+ UNION ALL
+
+ Select Name,  NULL , sum(Salary) 
+ from tblEmployee 
+ group by Name
+
+ UNION ALL
+
+ Select NULL,  d.DeptName , sum(Salary) 
+ from tblEmployee e join tblDepartment d
+ on e.DepartmentId = d.DeptId
+ group by d.DeptName
+
+ UNION ALL
+
+ Select NULL, NULL, sum(Salary)
+ from tblEmployee 
+ 
+ o/P:
+ Name	DeptName	(No column name)
+Todd	Admin	4800
+Ben	HR	4800
+Sara	HR	5000
+Pam	IT	6000
+Sara	IT	3200
+Valarie	IT	4500
+Mike	Payroll	3400
+Ben	NULL	4800
+Mike	NULL	3400
+Pam	NULL	6000
+Sara	NULL	8200
+Todd	NULL	4800
+Valarie	NULL	4500
+NULL	Admin	4800
+NULL	HR	9800
+NULL	IT	13700
+NULL	Payroll	3400
+NULL	NULL	31700
