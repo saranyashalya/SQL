@@ -1,0 +1,87 @@
+
+Question:
+for each department, return the Scientist names, if there is no scientist in a department then return the name of the employee who is present. 
+
+
+SELECT *
+  FROM [sample].[dbo].[tblEmployees]
+  
+Id	Name	DateOfBirth	Gender	DepartmentId	Scientist
+1	Sam	1980-12-30 00:00:00.000	Male	1	Yes       
+2	Pam	1982-09-01 12:02:36.260	Female	2	Yes       
+3	John	1985-08-22 12:03:30.370	Male	1	no        
+4	Sara	1979-11-29 12:59:30.670	Female	3	no        
+5	Todd	1978-11-29 12:59:30.670	Male	1	no        
+
+Select * from tblDepartment
+DeptId	DeptName
+1	IT
+2	Payroll
+3	HR
+4	Admin
+
+Select DISTINCT(DeptName),ISNULL((Select Name from tblEmployees where Scientist ='Yes' and DepartmentId = t1. DeptId), t1.Name) as 'Scientist Name'
+from 
+(Select DeptName, DeptId, Name, Scientist from
+tblEmployees
+full join
+tblDepartment 
+on tblDepartment.DeptId = tblEmployees.DepartmentId ) t1
+
+DeptName	Scientist Name
+Admin	NULL
+HR	Sara
+IT	Sam
+Payroll	Pam
+
+Question:
+
+Return the uin for every employee from empl_uin table only for the distinct values of uin. otherwise return NULL.
+
+SELECT TOP (1000) [Id]
+      ,[Name]
+      ,[Salary]
+      ,[Gender]
+      ,[DepartmentId]
+  FROM [sample].[dbo].[tblEmployee]
+
+o/p:
+Id	Name	Salary	Gender	DepartmentId
+1	Sara	5000	Male	3
+2	Mike	3400	Male	2
+3	Pam	6000	Female	1
+4	Todd	4800	Male	4
+5	Sara	3200	Female	1
+6	Ben	4800	Male	3
+7	Valarie	4500	Female	1
+
+  Select * from Emp_uin
+o/p:
+Id	UIN
+1	1000
+2	2000
+3	3000
+3	4000
+5	5000
+8	8000
+  
+  Select ID, case when uin_count>1 then NULL 
+  else (Select UIN from Emp_uin where ID = a.ID)  
+  end as Unique_uin
+  from  (Select tblEmployee.Id as ID, count(Emp_uin.UIN) as uin_count
+  from tblEmployee left outer join Emp_uin
+  on tblEmployee.Id = Emp_uin.Id
+  group by tblEmployee.Id) a
+  
+  o/p:
+  ID	Unique_uin
+1	1000
+2	2000
+3	NULL
+4	NULL
+5	5000
+6	NULL
+7	NULL
+
+
+
