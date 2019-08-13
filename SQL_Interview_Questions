@@ -85,3 +85,60 @@ Id	UIN
 
 
 
+Question:
+Find the Oldest and youngest person in Employees in both Gender
+
+SELECT TOP (1000) [Id]
+      ,[Name]
+      ,[DateOfBirth]
+      ,[Gender]
+      ,[DepartmentId]
+      ,[Scientist]
+  FROM [sample].[dbo].[tblEmployees]
+
+o/p:
+Id	Name	DateOfBirth	Gender	DepartmentId	Scientist
+1	Tam	1980-12-30 00:00:00.000	Female	1	Yes       
+2	Sam	1982-09-01 12:02:36.260	Male	2	no        
+3	Ram	1985-08-22 12:03:30.370	Male	1	no        
+4	Todd	1979-11-29 12:59:30.670	Male	3	no        
+5	Tanya	1978-11-29 12:59:30.670	Female	1	Yes       
+
+Answer
+option 1:
+  Select Gender, min(DateOfBirth) from tblEmployees group by Gender
+o/p:
+Gender	Oldest
+Female	1978-11-29 12:59:30.670
+Male	1979-11-29 12:59:30.670
+
+option 2:
+  select Name, Gender, DateOfBirth from 
+  (select *, ROW_NUMBER() OVER(PARTITION BY Gender order by DateOfBirth) as Oldest from tblEmployees ) x
+  where Oldest = 1
+
+o/p:
+Name	Gender	DateOfBirth
+Tanya	Female	1978-11-29 12:59:30.670
+Todd	Male	1979-11-29 12:59:30.670
+
+
+Questin:
+create histogram for salary bucket with the count of employees
+
+  select case 
+  when Salary between 3000 and 4000 then '3000-4000'
+  when Salary between 4000 and 5000 then '4000-5000'
+  when Salary >5000 then '>5000' end as bucket,
+  count(*) as 'empl_count'
+  from tblEmployee 
+  group by case 
+  when Salary between 3000 and 4000 then '3000-4000'
+  when Salary between 4000 and 5000 then '4000-5000'
+  when Salary >5000 then '>5000' end 
+
+o/p:
+bucket	empl_count
+>5000	1
+3000-4000	2
+4000-5000	4
